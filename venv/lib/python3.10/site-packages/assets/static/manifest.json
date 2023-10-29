@@ -1,0 +1,9 @@
+{
+    "javascript": {
+        "target_dir":"js",
+        "target_ext":".js",
+        "items": {
+            "livereload":{"sources":["assets/js/livereload.js"]}
+        }
+    }
+}
