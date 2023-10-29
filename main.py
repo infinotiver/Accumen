@@ -27,7 +27,7 @@ async def on_ready():
   print(colored(font.renderText(client.user.name), "blue"))
   print(
     colored(f"[+] Logged in as {client.user} (ID: {client.user.id})", "blue"))
-  print(colored(f"[+] Connected to {len(client.guilds)} servers", "blue"))
+  print(colored(f"[+] Connecited to {len(client.guilds)} servers", "blue"))
   print(colored(f"[+] Serving {len(client.users)} users", "blue"))
   print(
     colored(
