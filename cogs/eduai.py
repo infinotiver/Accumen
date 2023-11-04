@@ -26,42 +26,19 @@ class EduAI(commands.Cog):
     group = app_commands.Group(name="eduai", description="artificial intelligence")
 
     @group.command(name="chat", description="talk to ai")
-    async def chat(self, ctx, text: str, time: int = None):
+    async def chat(self, ctx, text: str):
         await ctx.response.defer(ephemeral=True)
-        if not time:
-            time = 10
-        url = "https://you-chat-gpt.p.rapidapi.com/"
-        payload = {"question": text, "max_response_time": time}
+        url = "https://ai-chatbot.p.rapidapi.com/chat/free"
+        querystring = {"message": text, "uid": ctx.user.id}
         headers = {
-            "content-type": "application/json",
             "X-RapidAPI-Key": os.environ["rapidapi"],
-            "X-RapidAPI-Host": "you-chat-gpt.p.rapidapi.com",
+            "X-RapidAPI-Host": "ai-chatbot.p.rapidapi.com",
         }
-        response = requests.request("POST", url, json=payload, headers=headers)
-        d = json.loads(response.content)
-        # print(d["answer"])
-        await ctx.followup.send(embed=dembed(description=d["answer"], preset="beta"))
+        response = requests.get(url, headers=headers, params=querystring)
+        d = response.json()
 
-    @group.command(name="gen", description="generate")
-    async def text2img(self, ctx, *, text: str):
-        await ctx.response.defer(ephemeral=True)
-        chat = query(
-            {
-                "inputs": {
-                    "past_user_inputs": [],
-                    "generated_responses": [],
-                    "text": text,
-                },
-                "wait_for_model": True,
-            }
-        )
-        print(chat)
         await ctx.followup.send(
-            embed=dembed(
-                description=chat["generated_text"],
-                preset="beta",
-                footer="Doesnt saves past input as of now... Responses can be wild \n Using 3rd Party Extension",
-            )
+            embed=dembed(description=d["chatbot"]["response"], preset="beta")
         )
 
 
