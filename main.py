@@ -16,13 +16,11 @@ import utils.buttons as ubuttons
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="a!", intents=intents)
-# client = app_commands.Commandclient(client)
 
 
 @client.event
 async def on_ready():
   os.system("clear")
-
   font = Figlet(font="standard")
   print(colored(font.renderText(client.user.name), "blue"))
   print(
@@ -57,10 +55,6 @@ async def on_ready():
   await client.tree.sync()
 
 
-@app_commands.command(name="hi")
-async def hello(interaction: discord.Interaction):
-  """Says hello!"""
-  await interaction.response.send_message(f"Hi, {interaction.user.mention}")
 
 
 keep_alive()
