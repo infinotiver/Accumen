@@ -1,6 +1,6 @@
 from simpcalc import simpcalc
 import discord
-
+from math import pi, tau, e, sqrt
 
 class InteractiveView(discord.ui.View):
     def __init__(self):
@@ -82,7 +82,12 @@ class InteractiveView(discord.ui.View):
     ):
         self.expr += "*"
         await interaction.response.edit_message(content=f"```\n{self.expr}\n```")
-
+    @discord.ui.button(style=discord.ButtonStyle.green, label="π", row=2)
+    async def pie(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        self.expr += "π"
+        await interaction.response.edit_message(content=f"```\n{self.expr}\n```")
     @discord.ui.button(style=discord.ButtonStyle.gray, label=".", row=3)
     async def dot(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.expr += "."
@@ -92,16 +97,11 @@ class InteractiveView(discord.ui.View):
     async def zero(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.expr += "0"
         await interaction.response.edit_message(content=f"```\n{self.expr}\n```")
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, label="=", row=3)
-    async def equal(self, interaction: discord.Interaction, button: discord.ui.Button):
-        try:
-            self.expr = await self.calc.calculate(self.expr)
-        except:  # if you are function only, change this to BadArgument
-            return await interaction.response.send_message(
-                "Um, looks like you provided a wrong expression...."
-            )
+    @discord.ui.button(style=discord.ButtonStyle.gray, label="00", row=3)
+    async def double_zero(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.expr += "00"
         await interaction.response.edit_message(content=f"```\n{self.expr}\n```")
+
 
     @discord.ui.button(style=discord.ButtonStyle.green, label="-", row=3)
     async def minus(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -121,7 +121,16 @@ class InteractiveView(discord.ui.View):
     ):
         self.expr += ")"
         await interaction.response.edit_message(content=f"```\n{self.expr}\n```")
-
+    @discord.ui.button(style=discord.ButtonStyle.blurple, label="=", row=4)
+    async def equal(self, interaction: discord.Interaction, button: discord.ui.Button):
+        try:
+            self.expr=self.expr.replace("π", str(pi))
+            self.expr = await self.calc.calculate(self.expr)
+        except:  # if you are function only, change this to BadArgument
+            return await interaction.response.send_message(
+                "Um, looks like you provided a wrong expression...."
+            )
+        await interaction.response.edit_message(content=f"```\n{self.expr}\n```")
     @discord.ui.button(style=discord.ButtonStyle.red, label="Clear", row=4)
     async def clear(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.expr = ""
