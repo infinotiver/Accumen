@@ -25,8 +25,8 @@ async def on_ready():
   print(colored(font.renderText(client.user.name), "blue"))
   print(
     colored(f"[+] Logged in as {client.user} (ID: {client.user.id})", "blue"))
-  print(colored(f"[+] Connecited to {len(client.guilds)} servers", "blue"))
-  print(colored(f"[+] Serving {len(client.users)} users", "blue"))
+  print(colored(f"[+] Connected to {len(client.guilds)} servers", "blue"))
+  print(colored(f"[+] Available to {len(client.users)} users", "blue"))
   print(
     colored(
       f"[+] Memory usage: {psutil.Process().memory_info().rss / 1024 ** 2:.2f} MB",
@@ -36,10 +36,10 @@ async def on_ready():
     if filename.endswith(".py"):
       try:
         await client.load_extension(f"cogs.{filename[:-3]}")
-        print(colored(f"[+] Loaded {filename}", "green"))
+        print(colored(f"[+] {filename}", "green"))
       except Exception as e:
         print(colored(f"[-] Not Loaded {filename}\n {e}", "red"))
-  print(colored("[+] All available cogs loaded", "green"))
+  print(colored("[+] All available cogs loaded", "blue"))
   # Send an initial message to a specific channel on startup
   channel = client.get_channel(
     953571969780023366)  # Replace with your channel ID
@@ -51,12 +51,9 @@ async def on_ready():
   em.add_field(name="Users", value=f"{len(client.users)}", inline=True)
   await channel.send(embed=em)
   client.add_view(ubuttons.Qrscontrol())
-  print(colored(f"[+] Persistent View (Queries)", "blue"))
+  client.add_view(ubuttons.answercontrol())
+  print(colored("[+] Persistent View ", "light_blue"))
   await client.tree.sync()
 
-
-
-
 keep_alive()
-
 client.run(os.environ["token"], reconnect=True)

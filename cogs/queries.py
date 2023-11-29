@@ -1,10 +1,9 @@
 import discord
-import json
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord import app_commands
+import json
 import requests
 import os
-import json
 import utils.functions as funcs
 from utils.functions import dembed, theme, divider
 from discord.utils import format_dt
@@ -14,6 +13,7 @@ import typing
 import asyncio
 from reactionmenu import ViewMenu, ViewButton
 import utils.buttons as assetsb
+import datetime
 
 nest_asyncio.apply()
 
@@ -22,11 +22,12 @@ mongo_url = os.environ["mongodb"]
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 queries_col = cluster["accumen"]["queries"]
 incoming = cluster["accumen"]["incoming"]
-# esult = queries_col.delete_many({})
-# print("documents deleted.")
+def delete_everything():
+  queries_col.delete_many({})
+  print("Deleted Everything")
+delete_everything()
 SUBJECTS = {
-    "English Language": "english_language",
-    "English Literature": "english_literature",
+    "Languages": "language",
     "Mathematics": "mathematics",
     "Biology": "biology",
     "Chemistry": "chemistry",
@@ -36,8 +37,6 @@ SUBJECTS = {
     "Computer Science": "computer_science",
     "Fine Arts": "fine_arts",
     "Economics": "economics",
-    "Foreign Languages": "foreign_languages",
-    "Physical Education": "physical_education",
     "Health Science": "health_science",
     "Law": "law",
     "Media Studies": "media_studies",
@@ -51,90 +50,83 @@ EDUCATION_LEVELS = {
     "Postgraduate": "5",
     "Doctorate": "6",
 }
-# Define a list comprehension to create the subject choices
+Status={
+  "Open":"False",
+  "Closed":"True"
+}
 subject_choices = [
     app_commands.Choice(name=name, value=value) for name, value in SUBJECTS.items()
 ]
-
-# Define a list comprehension to create the education level choices
 education_level_choices = [
     app_commands.Choice(name=name, value=value)
     for name, value in EDUCATION_LEVELS.items()
 ]
-
-
-async def get_filtered_queries(category=None, difficulty=None):
+status_choices =[
+                    app_commands.Choice(name=name, value=value)
+                    for name, value in Status.items()
+                ]
+async def get_filtered_queries(category=None, difficulty=None,status=None):
     query_filter = {}
     if category:
         query_filter["category"] = category
     if difficulty:
         query_filter["difficulty"] = difficulty
+    if status:
+        query_filter["closed"]=status
+      
     queries_cursor = queries_col.find(query_filter)
     queries = []
     async for query in queries_cursor:
         queries.append(query)
     return queries
 
+async def auto_close_queries():
+  seven_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=7)
+  await queries_col.update_many(
+      {"closed": False, "timestamp": {"$lt": seven_days_ago}},
+      {"$set": {"closed": True}},
+  )
 
 class Assist(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
     group = app_commands.Group(name="query", description="Query Ask")
-
     async def query_autocompletion(
-        interaction: discord.Interaction, current: str, option: bool = False
+        self, interaction: discord.Interaction, current: str
     ) -> typing.List[app_commands.Choice[str]]:
-        data = []
-        queries_cursor = queries_col.to_list(length=None)
-        queries = []
-        async for query in queries_cursor:
-            queries.append(query)
+      data = []
+      queries_cursor = queries_col.find({})  # Use the find method to query the collection
+      async for query in queries_cursor:  # Iterate over the cursor to construct the choices
+          title_words = query["title"].split()
+          for word in title_words:
+              if current.lower() in map(str.lower, title_words):
+                  data.append(app_commands.Choice(name=query["title"], value=query["_id"]))
+                  break
+      return data
 
-        for query in queries:
-            print(query)
-            title_words = query["title"].split()
-            print(f"Title {title_words[0]}")
-
-            for word in title_words:
-                if current.text.lower() == word.lower():
-                    data.append(
-                        discord.Choice(label=query["title"], value=query["_id"])
-                    )
-                    break
-        return data
 
     @group.command(
         name="post",
-        description="Ask to People.Post your query here and get answers from all the servers ",
+        description="Post your query here and get answers from users from all servers. ",
     )
-    @app_commands.choices(
-        category=[
-            app_commands.Choice(name=name, value=value)
-            for name, value in SUBJECTS.items()
-        ]
-    )
-    @app_commands.choices(
-        diffi=[
-            app_commands.Choice(name=name, value=value)
-            for name, value in EDUCATION_LEVELS.items()
-        ]
-    )
-    async def pt(
+    @app_commands.choices(category=subject_choices)
+    @app_commands.choices(difficulty=education_level_choices)
+    async def post(
         self,
         ctx,
         category: app_commands.Choice[str],
-        diffi: app_commands.Choice[str],
+        difficulty: app_commands.Choice[str],
         title: str,
         description: str,
     ):
         await ctx.response.defer(ephemeral=False)
-        id = funcs.generate_query_id(title, description)
+        id =str(await queries_col.count_documents({}) + 1)
         query = {
             "_id": id,
             "user_id": ctx.user.id,
             "category": category.value,
-            "difficulty": diffi.value,
+            "difficulty": difficulty.value,
             "title": title,
             "description": description,
             "timestamp": ctx.created_at.timestamp(),
@@ -147,28 +139,28 @@ class Assist(commands.Cog):
         # Insert the query into the queries collection
         await queries_col.insert_one(query)
         embed = discord.Embed(title=f"**{title}**", color=theme)
-        authr = f"{str(ctx.user.display_name)} ∙ {diffi.name}"
+        authr = f"{str(ctx.user.name)} [{str(ctx.user.id)}] ∙ {difficulty.name}"
         embed.set_author(name=authr, icon_url=ctx.user.avatar.url)
-        embed.add_field(name="Votes", value="0")
+        embed.add_field(name="Upvotes", value="0")
         embed.add_field(name="Category", value=f"`{category.name}`")
-        embed.add_field(name="Answer", value="`10`points")
+        embed.add_field(name="Reward", value="Work In Progress")
         timestamp = format_dt(ctx.created_at, "R")
-        des = f"**{id}** ∙ Posted in {ctx.guild.name} , {timestamp}\n{divider}\n **{description}**"
+        des = f"Query ID: **{id}** ∙ Posted in {ctx.guild.name} , {timestamp}\n{divider}\n **{description}**"
         embed.description = des
-        sent = dembed(
-            title="Query Submitted",
-            description="Keep your dm open",
+        sent_embed = dembed(
+            title="Query posted",
+            description="Keep your direct messages open to receive answers.",
             color=funcs.secondary_theme,
         )
-        sent.add_field(name="Query", value=description, inline=False)
-        omsg = await ctx.followup.send(embed=sent)
+        sent_embed.add_field(name="Query", value=title, inline=False)
+        omsg = await ctx.followup.send(embed=sent_embed)
         data = await incoming.find().to_list(length=None)
         for x in data:
+          try:
             guild = await self.bot.fetch_guild(int(x["_id"]))
             channel = self.bot.get_channel(int(x["channel"]))
 
             view = assetsb.Qrscontrol()
-            #          self.bot.add_view(view())
             view.add_item(
                 discord.ui.Button(
                     label="Community",
@@ -176,7 +168,7 @@ class Assist(commands.Cog):
                     url="https://discord.gg/Nvts32BAwr",
                 )
             )
-            msg = await channel.send(content="New Query", embed=embed, view=view)
+            msg = await channel.send(content="### New Query", embed=embed, view=view)
 
             fq = await queries_col.find_one({"_id": id})
             fq["messages"].append(
@@ -184,7 +176,8 @@ class Assist(commands.Cog):
             )
             await queries_col.replace_one({"_id": id}, fq)
             view.message = msg
-
+          except:
+            pass
         oview = discord.ui.View(timeout=None)
         oview.add_item(
             discord.ui.Button(
@@ -193,22 +186,30 @@ class Assist(commands.Cog):
                 disabled=True,
             )
         )
-        await omsg.edit(embed=sent, view=oview)
+        await omsg.edit(embed=sent_embed, view=oview)
 
-    @group.command(name="answer", description="Answer ")
+    @group.command(name="answer", description="Answer someone's query")
     @app_commands.autocomplete(query_id=query_autocompletion)
     async def answer_query(self, ctx, query_id: str, answer: str):
         await ctx.response.defer(ephemeral=False)
-        # Find the query in the database
         query = await queries_col.find_one({"_id": query_id})
-
+        title = query.get("title")
         if not query:
-            await ctx.followup.send(f"Query with ID {query_id} not found.")
+            await ctx.followup.send(
+                embed=dembed(description="Query with ID {query_id} not found.",color=discord.Color.red())
+            )
             return
         user_id = ctx.user.id
+        if query["closed"] == True:
+          await ctx.followup.send(
+            embed=dembed(description="That query is no longer accepting answers.")
+          )
+          return
         for answer in query.get("answers", []):
             if answer.get("user") == user_id:
-                await ctx.followup.send("You have already answered this query.")
+                await ctx.followup.send(
+                    embed=dembed(description="You have already answered this query.")
+                )
                 return
         # Add the answer to the query document
         if "answers" not in query:
@@ -219,37 +220,58 @@ class Assist(commands.Cog):
 
         # Update the query in the database
         result = await queries_col.replace_one({"_id": query_id}, query)
-
+  
         if result.modified_count == 0:
-            await ctx.followup.send("Failed to update query.")
+            await ctx.followup.send(
+                embed=dembed(description="Failed to update query.\nPlease retry ")
+            )
             return
-
-        # Get the original answerer's user ID
-        des = f"Posted on {ctx.guild.name}\n{divider}\n Query ID: {query_id}\nAnswer: {answer}"
-        original_answerer_id = query.get("user_id")
+        title=query.get("title")
+        # Get the asker user ID
+        des = f"### {title}\nAnswered on {ctx.guild.name}\n{divider}\n{query_id}\n{title}\n{divider}\n**### Answer**\n {answer}"
+        original_questioner_id = query.get("user_id")
         embed = dembed(title="New Answer", description=des, color=theme)
         embed.set_author(name=ctx.user.name, icon_url=ctx.user.avatar.url)
-        await ctx.followup.send("Answered Query...")
-        # Send a DM to the original answerer with the new answer
-        if original_answerer_id:
-            # Fetch the original answerer and create a view with two buttons
-            original_answerer = await self.bot.fetch_user(original_answerer_id)
-            message = await original_answerer.send("New Answer 📩", embed=embed)
+        embed.set_footer(text=f"{str(ctx.user.name)} [{str(ctx.user.id)}]")
+        
+        await ctx.followup.send(embed=dembed(description="Query answered successfully"))
+        # Send a DM to the asker with the new answer
+        if original_questioner_id:
+          try:
+            view=assetsb.answercontrol()
+            await original_answerer_id.send("New Answer Received 📩",embed=embed,view=view)
+          except:
+            print("Cant send message to original questioner")
 
     @group.command(name="list", description="Checkout")
-    # @commands.has_permissions(manage_messages=True)
-    async def listset(self, ctx):
+    @app_commands.choices(category=subject_choices)
+    @app_commands.choices(difficulty=education_level_choices)
+    @app_commands.choices(status=status_choices)
+    async def list_queries(
+        self,
+        ctx,
+        *,
+        category: app_commands.Choice[str]=None,
+        difficulty: app_commands.Choice[str]=None,
+        status:app_commands.Choice[str]=None
+    ):
+      if status.value=="False":
+        status.value=False
+      else:
+        status.value=True
+      if not category and not difficulty:
         await ctx.response.defer()
-        queries_cursor = queries_col.find()
-        queries = []
-        async for query in queries_cursor:
-            queries.append(query)
-        print(queries)
+        queries=await get_filtered_queries(status=status.value)
+        menu_title = "All Queries on Accumen"
+        if category:
+            menu_title = f"Queries in {category.value}"
+        elif difficulty:
+            menu_title = f"Queries in {difficulty.value}"
         menu = ViewMenu(
             ctx,
             menu_type=ViewMenu.TypeEmbedDynamic,
             rows_requested=1,
-            custom_embed=dembed(title="All Queries on Accumen"),
+            custom_embed=dembed(title=menu_title),
         )
         for x in queries:
             id = x["_id"]
@@ -260,22 +282,17 @@ class Assist(commands.Cog):
             difficulty = x["difficulty"]
             guild = await self.bot.fetch_guild(x["guild_id"])
             closed = x["closed"]
-            status = (
-                "<:Y1:1045710123739381841> Yes"
-                if not closed
-                else "<:N1:1045709774785875998> No"
-            )
+            status = "Yes" if not closed else " No"
             # Get the total number of answers
-            num_answers = len(query.get("answers", []))
+            num_answers = len(x.get("answers", []))
 
-            # Get the list of answers
-            answers_list = []
-            for answer in query.get("answers", []):
-                answer_text = answer["ans"]
-                answer_user = self.bot.fetch_user(answer["user"])
-                answers_list.append(f"{answer_text} by {answer_user.name}")
+            # Replace category in the description with an empty string if category is provided
+            category_text = f"**Category:** {category}" if not category else ""
+            # Replace difficulty in the description with an empty string if difficulty is provided
+            difficulty_text = f"**Difficulty:** {difficulty}" if not difficulty else ""
+
             # Format the description string with all the available information
-            des = f"**ID:** {id}\n**Title:** {title}\n**Description:** {desc}\n**Category:** {category}\n**Difficulty:** {difficulty}\n**Created:** <t:{time}:R>\n**Guild:** {guild.name}\n**Open:** {status}\n**Total Answers:** {num_answers}\n**Answers:** {', '.join(answers_list) if answers_list else 'None'}\n{divider}"
+            des = f"**ID:** {id}\n**Title:** {title}\n**Description:** {desc}\n{category_text}\n{difficulty_text}\n**Created:** <t:{time}:R>\n**Guild:** {guild.name}\n**Open:** {status}\n**Total Answers:** {num_answers}"
             menu.add_row(des)
 
         # ViewButton.ID_PREVIOUS_PAGE
@@ -294,81 +311,208 @@ class Assist(commands.Cog):
         )
         menu.add_button(next_button)
         await menu.start()
+      elif difficulty and not category:
+        queries=await get_filtered_queries(difficulty=difficulty.value,status=status.value)
+        menu_title = f"Queries in {difficulty.value}"
+        menu = ViewMenu(
+            ctx,
+            menu_type=ViewMenu.TypeEmbedDynamic,
+            rows_requested=1,
+            custom_embed=dembed(title=menu_title),
+        )
+        for x in queries:
+          id = x["_id"]
+          title = x["title"]
+          desc = x["description"]
+          time = round(x["timestamp"])
+          category = x["category"]
+          difficulty = x["difficulty"]
+          guild = await self.bot.fetch_guild(x["guild_id"])
+          closed = x["closed"]
+          status = "Yes" if not closed else " No"
+          # Get the total number of answers
+          num_answers = len(x.get("answers", []))
 
+          # Replace category in the description with an empty string if category is provided
+          category_text = f"**Category:** {category}" if not category else ""
+
+          # Format the description string with all the available information
+          des = f"**ID:** {id}\n**Title:** {title}\n**Description:** {desc}\n{category_text}\n**Created:** <t:{time}:R>\n**Guild:** {guild.name}\n**Open:** {status}\n**Total Answers:** {num_answers}"
+          menu.add_row(des)
+
+        # ViewButton.ID_PREVIOUS_PAGE
+        back_button = ViewButton(
+          style=discord.ButtonStyle.primary,
+          label="Back",
+          custom_id=ViewButton.ID_PREVIOUS_PAGE,
+        )
+        menu.add_button(back_button)
+
+        # ViewButton.ID_NEXT_PAGE
+        next_button = ViewButton(
+          style=discord.ButtonStyle.secondary,
+          label="Next",
+          custom_id=ViewButton.ID_NEXT_PAGE,
+        )
+        menu.add_button(next_button)
+        await menu.start()
+      elif  category and not difficulty:
+        queries=await get_filtered_queries(category=category.value,status=status.value)
+        menu_title = f"Queries in {category.value}"
+        menu = ViewMenu(
+            ctx,
+            menu_type=ViewMenu.TypeEmbedDynamic,
+            rows_requested=1,
+            custom_embed=dembed(title=menu_title),
+        )
+        for x in queries:
+          id = x["_id"]
+          title = x["title"]
+          desc = x["description"]
+          time = round(x["timestamp"])
+          category = x["category"]
+          difficulty = x["difficulty"]
+          guild = await self.bot.fetch_guild(x["guild_id"])
+          closed = x["closed"]
+          status = "Yes" if not closed else " No"
+          # Get the total number of answers
+          num_answers = len(x.get("answers", []))
+
+          # Replace difficulty in the description with an empty string if difficulty is provided
+          difficulty_text = f"**Difficulty:** {difficulty}" if not difficulty else ""
+
+          # Format the description string with all the available information
+          des = f"**ID:** {id}\n**Title:** {title}\n**Description:** {desc}\n**Category:** {category}\n{difficulty_text}\n**Created:** <t:{time}:R>\n**Guild:** {guild.name}\n**Open:** {status}\n**Total Answers:** {num_answers}"
+          menu.add_row(des)
+
+        # ViewButton.ID_PREVIOUS_PAGE
+        back_button = ViewButton(
+          style=discord.ButtonStyle.primary,
+          label="Back",
+          custom_id=ViewButton.ID_PREVIOUS_PAGE,
+        )
+        menu.add_button(back_button)
+
+        # ViewButton.ID_NEXT_PAGE
+        next_button = ViewButton(
+          style=discord.ButtonStyle.secondary,
+          label="Next",
+          custom_id=ViewButton.ID_NEXT_PAGE,
+        )
+        menu.add_button(next_button)
+        await menu.start()
+      elif category and difficulty:
+        queries=await get_filtered_queries(category=category.value,difficulty=difficulty.value,status=status.value)
+        menu_title = f"Queries in {category.value} - {difficulty.name}"
+        menu = ViewMenu(
+            ctx,
+            menu_type=ViewMenu.TypeEmbedDynamic,
+            rows_requested=1,
+            custom_embed=dembed(title=menu_title),
+        )
+        for x in queries:
+          id = x["_id"]
+          title = x["title"]
+          desc = x["description"]
+          time = round(x["timestamp"])
+          category = x["category"]
+          difficulty = x["difficulty"]
+          guild = await self.bot.fetch_guild(x["guild_id"])
+          closed = x["closed"]
+          status = "Yes" if not closed else " No"
+          # Get the total number of answers
+          num_answers = len(x.get("answers", []))
+
+          # Format the description string with all the available information
+          des = f"**ID:** {id}\n**Title:** {title}\n**Description:** {desc}\n**Category:** {category}\n**Difficulty:** {difficulty}\n**Created:** <t:{time}:R>\n**Guild:** {guild.name}\n**Open:** {status}\n**Total Answers:** {num_answers}"
+          menu.add_row(des)
+
+        # ViewButton.ID_PREVIOUS_PAGE
+        back_button = ViewButton(
+          style=discord.ButtonStyle.primary,
+          label="Back",
+          custom_id=ViewButton.ID_PREVIOUS_PAGE,
+        )
+        menu.add_button(back_button)
+
+        # ViewButton.ID_NEXT_PAGE
+        next_button = ViewButton(
+          style=discord.ButtonStyle.secondary,
+          label="Next",
+          custom_id=ViewButton.ID_NEXT_PAGE,
+        )
+        menu.add_button(next_button)
+        await menu.start()
     @group.command(
-        name="incoming", description="Set channel where you recieve all the queries"
+        name="channel", description="Set channel where you recieve all the queries"
     )
     @commands.has_permissions(manage_messages=True)
-    async def incomingset(self, ctx, channel: discord.TextChannel):
+    async def incomingset(
+        self, ctx, channel: discord.TextChannel=None, *, disable: bool = False
+    ):
         await ctx.response.defer()
-        results = await incoming.find_one({"_id": ctx.guild.id})
-        if not results:
-            query = {"_id": ctx.guild.id, "channel": channel.id}
-            await incoming.insert_one(query)
+        if not disable:
+            results = await incoming.find_one({"_id": ctx.guild.id})
+            if not results:
+                query = {"_id": ctx.guild.id, "channel": channel.id}
+                await incoming.insert_one(query)
 
-        else:
-            await incoming.update_one(
-                {"_id": ctx.guild.id}, {"$set": {"channel": channel.id}}
+            else:
+                await incoming.update_one(
+                    {"_id": ctx.guild.id}, {"$set": {"channel": channel.id}}
+                )
+            await ctx.followup.send(
+                embed=dembed(
+                    description=f"Successfuly Set Incoming  Channel for receiving queries \t {channel.mention}"
+                )
             )
-        await ctx.followup.send(
-            embed=dembed(
-                description=f"Successfuly Set Incoming  Channel \t {channel.mention}"
-            )
-        )
+        elif disable:
+            results = await incoming.find_one({"_id": ctx.guild.id})
+            if not results:
+                return await ctx.followup.send(
+                    "You haven't set any incoming channel yet"
+                )
+            else:
+                channel=await self.bot.get_channel(incoming.get("channel"))
+                await incoming.delete_one({"_id": ctx.guild.id})
+                await ctx.followup.send(
+                    embed=dembed(description=f"Successfuly unset {channel.mention} as incoming channel for receiving queries")
+                )
 
-    @group.command(name="dashboard", description="Access the query dashboard")
-    async def dashboard(self, ctx):
+    @group.command(name="close", description="Close a query...Closed queries no longer accept answers")
+    @commands.guild_only()
+    async def close_query(self, ctx, query_id: str):
         await ctx.response.defer()
+        incoming_channel=await incoming.find_one({"_id": ctx.guild.id})
+        if not incoming_channel or not incoming_channel.get("channel")==ctx.channel.id:
+          await ctx.followup.send(embed=dembed(description="Invalid Channel\n Please use the choosen query channel or set one..."))
+          return
+        # Find the query in the database
+        query = await queries_col.find_one({"_id": query_id})
 
-        # Fetch all queries from the database
-        queries_cursor = queries_col.find()
-        queries = []
-        async for query in queries_cursor:
-            queries.append(query)
+        if not query:
+            await ctx.followup.send(embed=dembed(description=f"Query with ID {query_id} not found."))
+            return
 
-        # Create a list of query IDs for easy reference
-        query_ids = [query["_id"] for query in queries]
+        # Check if the user has permission to close the query
+        if ctx.user.id != query.get("user_id"):
+            await ctx.followup.send(embed=dembed(description="You do not have permission to close this query."))
+            return
 
-        # Create a dictionary to store the query data
-        query_data = {}
+        # Check if the query is already closed
+        if query.get("closed"):
+            await ctx.followup.send(embed=dembed(description="This query is already closed."))
+            return
 
-        # Iterate over each query and store the relevant data
-        for query in queries:
-            if query["user_id"] == ctx.user.id:
-                query_id = query["_id"]
-                title = query["title"]
-                description = query["description"]
-                category = query["category"]
-                difficulty = query["difficulty"]
-                closed = query["closed"]
+        # Close the query
+        query["closed"] = True
+        await queries_col.replace_one({"_id": query_id}, query)
 
-                # Store the query data in the dictionary
-                query_data[query_id] = {
-                    "title": title,
-                    "description": description,
-                    "category": category,
-                    "difficulty": difficulty,
-                    "closed": closed,
-                }
-
-        # Create an embed to display the query dashboard
-        embed = discord.Embed(title="Query Dashboard", color=theme)
-
-        # Add fields for each query
-        for query_id in query_ids:
-            query = query_data[query_id]
-            title = query["title"]
-            category = query["category"]
-            difficulty = query["difficulty"]
-            closed = query["closed"]
-            status = "Closed" if closed else "Open"
-            # Create a formatted string to display the query information
-            query_info = f"**Title:** {title}\n**Category:** {category}\n**Difficulty:** {difficulty}\n**Status:** {status}\n{divider}"
-
-            # Add the query information as a field in the embed
-            embed.add_field(name=query_id, value=query_info, inline=False)
-        await ctx.followup.send(embed=embed)
-
-
+        # Inform the user that the query has been closed
+        await ctx.followup.send(embed=dembed(description=f"Query with ID {query_id} has been closed and will no longer accept answers"))
+    # Start the auto-close task loop
+    @tasks.loop(hours=72)  
+    async def auto_close_loop():
+        await auto_close_queries()
 async def setup(bot):
     await bot.add_cog(Assist(bot))

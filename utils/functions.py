@@ -2,19 +2,141 @@ import discord
 from typing import Union
 import string
 import random
-import nltk
-from nltk.corpus import stopwords
+#import nltk
+#from nltk.corpus import stopwords
 import datetime
 
-nltk.download("stopwords")
-nltk.download("punkt")
+#nltk.download("stopwords")
+#nltk.download("punkt")
 theme = 0x01EAFE
 secondary_theme = 0x3E3AF5
 tertiary_theme = 0x271C41
 
 divider = "<:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D3:1074952381667741786><:D3:1074952381667741786><:D3:1074952381667741786><:D3:1074952381667741786><:D3:1074952381667741786><:D5:1074952388500262922><:D5:1074952388500262922><:D5:1074952388500262922><:D5:1074952388500262922><:D5:1074952388500262922><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089>"
 
-
+language_dict=[
+  {
+    "name": "Arabic",
+    "code": "ar",
+    "longCode": "ar"
+  },
+  {
+    "name": "Asturian",
+    "code": "ast",
+    "longCode": "ast-ES"
+  },
+  {
+    "name": "Belarusian",
+    "code": "be",
+    "longCode": "be-BY"
+  },
+  {
+    "name": "Breton",
+    "code": "br",
+    "longCode": "br-FR"
+  },
+  {
+    "name": "Danish",
+    "code": "da",
+    "longCode": "da-DK"
+  },
+  {
+    "name": "German",
+    "code": "de",
+    "longCode": "de"
+  },
+  {
+    "name": "Greek",
+    "code": "el",
+    "longCode": "el-GR"
+  },
+  {
+    "name": "English",
+    "code": "en",
+    "longCode": "en"
+  },
+  {
+    "name": "English (US)",
+    "code": "en",
+    "longCode": "en-US"
+  },
+  {
+    "name": "English (Australian)",
+    "code": "en",
+    "longCode": "en-AU"
+  },
+  {
+    "name": "English (Canadian)",
+    "code": "en",
+    "longCode": "en-CA"
+  },
+  {
+    "name": "Spanish",
+    "code": "es",
+    "longCode": "es"
+  },
+  {
+    "name": "Persian",
+    "code": "fa",
+    "longCode": "fa"
+  },
+  {
+    "name": "French",
+    "code": "fr",
+    "longCode": "fr"
+  },
+  {
+    "name": "Irish",
+    "code": "ga",
+    "longCode": "ga-IE"
+  },
+  {
+    "name": "Italian",
+    "code": "it",
+    "longCode": "it"
+  },
+  {
+    "name": "Japanese",
+    "code": "ja",
+    "longCode": "ja-JP"
+  },
+  {
+    "name": "Dutch",
+    "code": "nl",
+    "longCode": "nl"
+  },
+  {
+    "name": "Portuguese",
+    "code": "pt",
+    "longCode": "pt"
+  },
+  {
+    "name": "Russian",
+    "code": "ru",
+    "longCode": "ru-RU"
+  },
+  {
+    "name": "Swedish",
+    "code": "sv",
+    "longCode": "sv"
+  },
+  {
+    "name": "Tamil",
+    "code": "ta",
+    "longCode": "ta-IN"
+  },
+  {
+    "name": "Ukrainian",
+    "code": "uk",
+    "longCode": "uk-UA"
+  },
+  {
+    "name": "Chinese",
+    "code": "zh",
+    "longCode": "zh-CN"
+  }
+]
+'''
 def extract_keyword(title, description):
     # Combine the title and description into a single text string
     text = f"{title} {description}"
@@ -34,23 +156,15 @@ def extract_keyword(title, description):
     )
 
     return keyword
+'''
+def generate_query_id(user):
 
-
-def generate_query_id(title, description):
-    # Define the characters to use in the ID
-    chars = string.ascii_letters + string.digits
-
-    # Extract a keyword from the title and description
-    keyword = extract_keyword(title, description)
-
-    # Generate a random 3-character string
-    rand_str = "".join(random.choices(chars, k=3))
 
     # Get the current timestamp
     timestamp_str = str(int(datetime.datetime.now().timestamp()))
 
     # Combine the keyword, random string, and timestamp to create the ID
-    query_id = f"{keyword}_{rand_str}_{timestamp_str}"
+    query_id = f"{user}_{timestamp_str}"
 
     return query_id
 

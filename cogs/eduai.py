@@ -24,8 +24,8 @@ class EduAI(commands.Cog):
         self.bot = bot
 
     group = app_commands.Group(name="eduai", description="artificial intelligence")
-
-    @group.command(name="chat", description="talk to ai")
+    # Highly fatal , random generations
+    @group.command(name="chat", description="Talk to ai")
     async def chat(self, ctx, text: str):
         await ctx.response.defer(ephemeral=True)
         url = "https://ai-chatbot.p.rapidapi.com/chat/free"
