@@ -2,17 +2,88 @@ import discord
 from typing import Union
 import string
 import random
-#import nltk
-#from nltk.corpus import stopwords
+import nltk
 import datetime
+from typing import Union, List, Dict
 
-#nltk.download("stopwords")
-#nltk.download("punkt")
+nltk.download("stopwords")
+nltk.download("punkt")
 theme = 0x01EAFE
 secondary_theme = 0x3E3AF5
 tertiary_theme = 0x271C41
 
+warning_color = 0xFFD700  # Yellow for warnings
+error_color = 0xFF0000  # Red for errors
+success_color = 0x00FF00  # Green for success messages
+mild_error_color = 0xFFA500  # Orange for mild errors
+info_color = 0x808080  # Gray for informational messages
+
+# Divider string
 divider = "<:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D3:1074952381667741786><:D3:1074952381667741786><:D3:1074952381667741786><:D3:1074952381667741786><:D3:1074952381667741786><:D5:1074952388500262922><:D5:1074952388500262922><:D5:1074952388500262922><:D5:1074952388500262922><:D5:1074952388500262922><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089>"
+
+def dembed(
+    title: str = None,
+    description: Union[str, List[Union[str, Dict[str, str]]], Dict[str, str]] = None,
+    thumbnail: str = None,
+    picture: str = None,
+    url: str = None,
+    preset: str = None,
+    footer: Union[str] = None,
+) -> discord.Embed:
+    embed = discord.Embed()
+
+    # Automatically assign color based on NLTK analysis and presets
+    if description and isinstance(description, str):
+        tokens = nltk.word_tokenize(description.lower())
+        if any(word in tokens for word in ["warning", "alert"]):
+            embed.color = warning_color
+            if not footer:
+                footer = "⚠️ Warning"
+        elif any(word in tokens for word in ["error", "critical"]):
+            embed.color = error_color
+            if not footer:
+                footer = "❌ Error"
+        elif any(word in tokens for word in ["success", "successful"]):
+            embed.color = success_color
+            if not footer:
+                footer = "✅ Success"
+        elif any(word in tokens for word in ["mild", "minor"]):
+            embed.color = mild_error_color
+            if not footer:
+                footer = "🟠 Mild Error"
+        elif any(word in tokens for word in ["info", "information"]):
+            embed.color = info_color
+            if not footer:
+                footer = "ℹ️ Information"
+
+    if title:
+        embed.title = title
+
+    # Process description based on its type
+    if description:
+        if isinstance(description, str):
+            description = f"{description}\n{divider}"
+            embed.description = description
+        elif isinstance(description, list):
+            description = "\n".join(str(line) for line in description)
+            embed.description = f"{description}\n{divider}"
+        elif isinstance(description, dict):
+            for key, value in description.items():
+                embed.add_field(name=key, value=value, inline=False)
+
+    if thumbnail:
+        embed.set_thumbnail(url=thumbnail)
+    if picture:
+        embed.set_image(url=picture)
+    if url:
+        embed.url = url
+    if footer:
+        embed.set_footer(text=footer)
+    if preset:
+        if preset == "beta":
+            embed.set_author(name="Accumen ∙ Beta Feature")
+
+    return embed
 
 language_dict=[
   {
@@ -169,43 +240,4 @@ def generate_query_id(user):
     return query_id
 
 
-def dembed(
-    title: str = None,
-    description: Union[str] = None,
-    thumbnail: str = None,
-    picture: str = None,
-    url: str = None,
-    color: Union[int, discord.Color] = 0x3E3AF5,
-    footer: Union[str] = None,
-    image: str = None,
-    preset: str = None,
-) -> discord.Embed:
-    embed = discord.Embed()
-    author = "Accumen"
-    if color != theme:
-        if isinstance(color, str):
-            color = int(color.replace("#", "0x"), base=16)
-        embed.color = color
-    else:
-        embed.color = color
-    if title:
-        embed.title = title
-    if description:
-        description = f"{description}\n{divider}"
-        embed.description = description
-    if thumbnail:
-        embed.set_thumbnail(url=thumbnail)
-    if picture:
-        embed.set_image(url=picture)
-    if image:
-        embed.set_image(url=image)
-    if url:
-        embed.url = url
-    if footer:
-        if isinstance(footer, str):
-            embed.set_footer(text=footer)
-    if preset:
-        if preset == "beta":
-            author += " ∙ Beta Feature"
-    embed.set_author(name=author)
-    return embed
+
