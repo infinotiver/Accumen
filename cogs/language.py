@@ -29,6 +29,7 @@ class Language(commands.Cog):
     @app_commands.choices(language=language_choices)
     @app_commands.describe(query_text="The message to check for grammar errors.")
     async def grammar(self, ctx, query_text: str,*,language:app_commands.Choice[str]):
+        await ctx.response.defer()
         try:
             if not language:
               language.value="en"
@@ -73,7 +74,7 @@ class Language(commands.Cog):
             main_embed = dembed(
                 title="Grammatical Improvements",
                 description=f" for {query_text}\n Please note that I may provide incorrect results as well.",
-                color=theme,
+  
             )
             menu.set_main_pages(main_embed)
 
@@ -94,7 +95,7 @@ class Language(commands.Cog):
             await menu.start()
 
         except:
-            await ctx.send(
+            await ctx.followup.send(
                 embed=dembed(
                     description="The word does not exist. Please check the spelling and try again."
                 )
