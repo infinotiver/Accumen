@@ -20,15 +20,18 @@ class AtlasGame:
         self.message = message_id
 async def fetch_data(place=None):
   try:
-    json_url = "https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries.jsonn"
+    json_url = "https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries.json"
     response = requests.get(json_url)
     response.raise_for_status()
     data = response.json()
   
     all_locations = []
-  
-    for country in data[0]:
-      all_locations.append(country["name"])
+    for country in data:
+      print(country)
+      for entry in country:
+        print(entry)
+        all_nations.append(entry["name"])
+       
   
     if not place:
         return all_locations
@@ -128,18 +131,22 @@ class Atlas(commands.Cog):
                   check= await fetch_data(input.content)
               except asyncio.TimeoutError:
                   await ctx.followup.send("Sorry, you didn't reply in time!")
-                  order.remove(player.id)
+                  order.pop(player.id)
               if input.content[0].upper() != current_alphabet:
                   await ctx.followup.send("Disqualified as input not from current alphabet")
-                  order.remove(player.id)
+                  order.pop(player.id)
               elif check==False:
                   await ctx.followup.send("Invalid entry")
-                  order.remove(player.id)
+                  order.pop(player.id)
               else:
                   self.games[str(ctx.guild.id)]["places_done"].append(input.content)
+                  print(self.games)
                   current_alphabet = input_content[-1]
                   player_index = (player_index + 1) % len(order)
-                  await ctx.send(f"The next player is {order[player_index]}. Send a place starting with the letter {current_alphabet}.")
+                  try:
+                    await input.delete()
+                  except:
+                    pass
                   await message.edit(embed=dembed(title="ATLAS Started", description=f"{player.mention} \nType a place from the letter \n# {current_alphabet}\n"))
     
           await ctx.followup.send("The game has ended.")
