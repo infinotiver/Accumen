@@ -27,10 +27,7 @@ async def fetch_data(place=None):
   
     all_locations = []
     for country in data:
-      print(country)
-      for entry in country:
-        print(entry)
-        all_nations.append(entry["name"])
+        all_locations.append(country["name"])
        
   
     if not place:
