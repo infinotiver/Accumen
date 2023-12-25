@@ -13,10 +13,15 @@ import utils.functions as funcs
 from utils.functions import dembed, theme, divider
 from keeplive import keep_alive
 import utils.buttons as ubuttons
-
+import motor.motor_asyncio
+import nest_asyncio
+import typing
+import asyncio
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="a!", intents=intents)
-
+mongo_url = os.environ["mongodb"]
+cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
+incoming = cluster["accumen"]["incoming"]
 
 @client.event
 async def on_ready():
@@ -50,7 +55,13 @@ async def on_ready():
   em.add_field(name="Servers", value=f"{len(client.guilds)}", inline=True)
   em.add_field(name="Users", value=f"{len(client.users)}", inline=True)
   await channel.send(embed=em)
-  client.add_view(ubuttons.Qrscontrol())
+  database=await incoming.find_one({"_id": "All"})
+  if database:
+    list_of_ids = database.get("ids", [])  # Use get to handle the case where 'ids' is not present
+    for message_id in list_of_ids:
+        client.add_view(ubuttons.Qrscontrol, message_id=message_id)
+  else:
+    print("No document found with _id='All'")
   client.add_view(ubuttons.answercontrol())
   print(colored("[+] Persistent View ", "light_blue"))
   await client.tree.sync()

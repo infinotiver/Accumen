@@ -10,7 +10,6 @@ from discord.utils import format_dt
 import motor.motor_asyncio
 import nest_asyncio
 import typing
-import asyncio
 from reactionmenu import ViewMenu, ViewButton
 import utils.buttons as assetsb
 import datetime
@@ -176,6 +175,14 @@ class Assist(commands.Cog):
             )
             await queries_col.replace_one({"_id": id}, fq)
             view.message = msg
+            storage=await incoming.find_one({"_id": "All"})
+            if not storage:
+              query={"_id": "All","ids":[]}
+              await incoming.insert_one(query)
+            storage=await incoming.find_one({"_id": "All"})
+            storage["ids"].append(msg.id)
+            await incoming.update_one({"_id": "All"},{"$set":{"ids":storage["ids"]}})
+            self.bot.add_view(view)
           except:
             pass
         oview = discord.ui.View(timeout=None)
@@ -239,7 +246,7 @@ class Assist(commands.Cog):
         if original_questioner_id:
           try:
             view=assetsb.answercontrol()
-            await original_answerer_id.send("New Answer Received 📩",embed=embed,view=view)
+            await original_questioner_id.send("New Answer Received 📩",embed=embed,view=view)
           except:
             print("Cant send message to original questioner")
 

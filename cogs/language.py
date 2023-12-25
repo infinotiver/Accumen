@@ -74,7 +74,6 @@ class Language(commands.Cog):
             main_embed = dembed(
                 title="Grammatical Improvements",
                 description=f" for {query_text}\n Please note that I may provide incorrect results as well.",
-  
             )
             menu.set_main_pages(main_embed)
 

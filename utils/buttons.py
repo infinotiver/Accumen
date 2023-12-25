@@ -5,7 +5,7 @@ import motor.motor_asyncio
 import nest_asyncio
 import os
 import discord.utils
-
+import datetime
 nest_asyncio.apply()
 
 mongo_url = os.environ["mongodb"]
@@ -32,6 +32,11 @@ class answercontrol(discord.ui.View):
     await interaction.response.send_message(
       "Query Closed",ephemeral=True
     )
+import uuid
+
+def generate_unique_string():
+    unique_str = str(uuid.uuid4())
+    return unique_str
 # for assist.py --- User control panel (cmd = new)
 class Qrscontrol(discord.ui.View):
 
@@ -42,7 +47,7 @@ class Qrscontrol(discord.ui.View):
   @discord.ui.button(
     label="Add an Answer",
     style=discord.ButtonStyle.success,
-    custom_id="persistent_view:answer",
+    custom_id=f"persistent_view:answer:{generate_unique_string()}",   
     emoji="✒"
   )
   async def ans(self, interaction: discord.Interaction,
@@ -57,7 +62,7 @@ class Qrscontrol(discord.ui.View):
   @discord.ui.button(
     label="Upvote",
     style=discord.ButtonStyle.blurple,
-    custom_id="persistent_view:vote",
+    custom_id=f"persistent_view:answer:{generate_unique_string()}",
     emoji="🔼"
   )
   async def vote(self, interaction: discord.Interaction,
@@ -100,7 +105,7 @@ class Qrscontrol(discord.ui.View):
   @discord.ui.button(
     label="Report WIP",
     style=discord.ButtonStyle.red,
-    custom_id="persistent_view:report",
+    custom_id=f"persistent_view:answer:{generate_unique_string()}",
     disabled=True,
     emoji="🛑"
   )
