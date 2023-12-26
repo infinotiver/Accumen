@@ -103,6 +103,7 @@ class Language(commands.Cog):
     @group.command(name="define")
     @app_commands.describe(text="The word to define.")
     async def dictionary(self, ctx, text: str):
+        await ctx.response.defer()
         try:
             url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{urllib.parse.quote_plus(text)}"
             response = requests.get(url)
@@ -146,10 +147,10 @@ class Language(commands.Cog):
                     name="Antonyms", value=", ".join(all_antonyms), inline=False
                 )
 
-            await ctx.response.send_message(embed=embed)
+            await ctx.followup.send(embed=embed)
             
         except:
-            await ctx.response.send_message(
+            await ctx.followup.send(
                 embed=dembed(
                     description="The word does not exist. Please check the spelling and try again."
                 )
