@@ -1,3 +1,27 @@
+def changelog():
+  text="""
+
+  Changelog ( With accordance to editor activity for personal use only)
+  25-12-2023 - 26-12-2023
+  - Added Changelog
+  - Removed AtlasGame class - no use
+  - game-announce
+    - Updated embed
+    - Updated dictionary format to include timestamps for announcement, start, end
+  - game-enter
+    - Added limit of 5 participants per game
+    - Removed unnecessary prints [ TESTING PRINTS ] (Don't include in Github)
+    - Now edits original message to include new participant 
+  - game-start
+    - Embeds for messages now
+    - Winner is declared
+  - Yet to Add
+    - Automatic start game once limit reaches (**)
+    - Automatic start game if time more than 2 and time elapsed more than 2 minutes else if time less than 2 delete game (***)
+    - Automatic delete dictionary entry after game end (***)
+  """
+  return text
+
 import os
 import asyncio
 import discord
@@ -11,13 +35,7 @@ import json
 import requests
 from json.decoder import JSONDecodeError
 
-class AtlasGame:
-    def __init__(self, guild_id, channel_id, initiator_id, message_id):
-        self.server = guild_id
-        self.channel = channel_id
-        self.users = [initiator_id]
-        self.places_done = []
-        self.message = message_id
+
 async def fetch_data(place=None):
   try:
     json_url = "https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries.json"
@@ -45,14 +63,13 @@ async def fetch_data(place=None):
   except requests.RequestException as req_error:
       print(f"Request error: {req_error}")
       return None  # Handle the error appropriately in your code
+  
 class Atlas(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
         self.locations = []
         self.games = {}
-
-
 
 
     atlas = app_commands.Group(
@@ -68,17 +85,22 @@ class Atlas(commands.Cog):
         embed = discord.Embed(
             title="ATLAS Announcement",
             description=(
-                f"\nAllowed Places\n* Countries\n* ~~States~~\n* ~~Cities~~\n* ~~Continents~~\n\n"
+                f"\nAllowed Places\n* Countries\n* ~~States~~\n* ~~Cities~~\n* ~~Continents~~\nStates and Cities coming soon...\n"
                 f"{divider}\n Interested members use /game-enter command"
             ),
-            color=theme
+            color=theme,
+            preset="beta"
         )
         msg = await ctx.followup.send(embed=embed)
         game =    { "server" :ctx.guild.id,
-      "channel" : ctx.channel.id,
-      "users" : [ctx.user.id],
-      "places_done" : [],
-      "message" : msg.id}
+        "channel" : ctx.channel.id,
+        "users" : [ctx.user.id],
+        "places_done" : [],
+        "message" : msg.id,
+        "time":{"announced": ctx.created_at.timestamp(),
+                 "started":0,
+                 "ended":0}
+                  }
         self.games[str(ctx.guild.id)] = game
         print(self.games)
 
@@ -94,27 +116,32 @@ class Atlas(commands.Cog):
             return await ctx.followup.send("You are already in the game")
         elif ctx.channel.id != self.games[str(ctx.guild.id)]["channel"]:
             return await ctx.followup.send("This is not the game channel")
+        elif len(self.games[str(ctx.guild.id)]["users"])>5:
+            return await ctx.followup.send("Currently , more than 5 participants can not play.")
         else:
             self.games[str(ctx.guild.id)]["users"].append(ctx.user.id)
-            print(self.games)
+            channel=await self.bot.fetch_channel(self.games[str(ctx.guild.id)]["channel"])
+            msg=await channel.get_message(self.games[str(ctx.guild.id)]["message"])
+            # EDIT MESSAGE WITH UPDATED PLAYER LIST
             await ctx.followup.send("You have entered the game")
+
+
     @atlas.command(name="game-start", description="Start a game of ATLAS")
     async def start(self, ctx):
       await ctx.response.defer()
       if str(ctx.guild.id) not in self.games:
-          return await ctx.followup.send("No game is currently running")
+          return await ctx.followup.send(embed=dembed(description="No game is currently running"))
       elif ctx.channel.id != self.games[str(ctx.guild.id)]["channel"]:
-          return await ctx.followup.send("This is not the game channel")
+          return await ctx.followup.send(embed=dembed(description="This is not the game channel"))
       elif len(self.games[str(ctx.guild.id)]["users"]) < 2:
-          return await ctx.followup.send("Insufficient members for game")
+          return await ctx.followup.send(embed=dembed(description="Insufficient members for game"))
       else:
-  
           order = self.games[str(ctx.guild.id)]["users"].copy()
           player = await self.bot.fetch_user(order[0])
           player_index = 0
           current_alphabet = "S"
           last_alphabet = None
-          embed = dembed(title="ATLAS Started", description=f"{player.mention}\nType a place from the letter \n# {current_alphabet}\n")
+          embed = dembed(title="ATLAS Started", description=f"{player.mention}\nType a place from the letter \n# {current_alphabet}\n",color=theme)
           message = await ctx.followup.send(embed=embed)
           while len(order) > 0:
               player_id = order[player_index]
@@ -127,14 +154,14 @@ class Atlas(commands.Cog):
 
                   check= await fetch_data(input.content)
               except asyncio.TimeoutError:
-                  await ctx.followup.send("Sorry, you didn't reply in time!")
-                  order.pop(player.id)
+                  await ctx.followup.send(embed=dembed(description=f"{player.mention} DISQUALIFIED \n- Didn't reply in time"))
+                  order.remove(player.id)
               if input.content[0].upper() != current_alphabet:
-                  await ctx.followup.send("Disqualified as input not from current alphabet")
-                  order.pop(player.id)
+                  await ctx.followup.send(embed=dembed(description=f" {player.mention} DISQUALIFIED\n- as input not from current alphabet"))
+                  order.remove(player.id)
               elif check==False:
-                  await ctx.followup.send("Invalid entry")
-                  order.pop(player.id)
+                  await ctx.followup.send(embed=dembed(description=f" {player.mention} DISQUALIFIED\n- Don't make up places"))
+                  order.remove(player.id)
               else:
                   self.games[str(ctx.guild.id)]["places_done"].append(input.content)
                   print(self.games)
@@ -145,8 +172,8 @@ class Atlas(commands.Cog):
                   except:
                     pass
                   await message.edit(embed=dembed(title="ATLAS Started", description=f"{player.mention} \nType a place from the letter \n# {current_alphabet}\n"))
-    
-          await ctx.followup.send("The game has ended.")
+          winner=await self.bot.fetch_user(order[0])
+          await ctx.followup.send(embed=dembed(description=f"## Game Ended.\n# Winner is {winner.mention}"))
   
 
 
