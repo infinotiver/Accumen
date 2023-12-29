@@ -210,7 +210,7 @@ python-versions = "*"
 
 [[package]]
 name = "discord.py"
-version = "2.2.2"
+version = "2.3.2"
 description = "A Python wrapper for the Discord API"
 category = "main"
 optional = false
@@ -1405,7 +1405,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10.0,<3.11"
-content-hash = "b956dc7d03d74ba683027cf8172d538777cac1381cf60132e2a93afd08fcf9e8"
+content-hash = "71cf0d1e0bfeb4ad5fb3acfe064d7539dc824b657f600c62ec425e776ffaf0a9"
 
 [metadata.files]
 aiohttp = []

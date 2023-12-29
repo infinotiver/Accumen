@@ -17,54 +17,58 @@ import motor.motor_asyncio
 import nest_asyncio
 import typing
 import asyncio
+
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="a!", intents=intents)
 mongo_url = os.environ["mongodb"]
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 incoming = cluster["accumen"]["incoming"]
 
+
 @client.event
 async def on_ready():
-  os.system("clear")
-  font = Figlet(font="standard")
-  print(colored(font.renderText(client.user.name), "blue"))
-  print(
-    colored(f"[+] Logged in as {client.user} (ID: {client.user.id})", "blue"))
-  print(colored(f"[+] Connected to {len(client.guilds)} servers", "blue"))
-  print(colored(f"[+] Available to {len(client.users)} users", "blue"))
-  print(
-    colored(
-      f"[+] Memory usage: {psutil.Process().memory_info().rss / 1024 ** 2:.2f} MB",
-      "light_blue",
-    ))
-  for filename in os.listdir("./cogs"):
-    if filename.endswith(".py"):
-      try:
-        await client.load_extension(f"cogs.{filename[:-3]}")
-        print(colored(f"[+] {filename}", "green"))
-      except Exception as e:
-        print(colored(f"[-] Not Loaded {filename}\n {e}", "red"))
-  print(colored("[+] All available cogs loaded", "blue"))
-  # Send an initial message to a specific channel on startup
-  channel = client.get_channel(
-    953571969780023366)  # Replace with your channel ID
-  system_latency = round(client.latency * 1000)
-  em = dembed(title=f"{client.user.name} Online!", description="I'm Up")
-  em.set_thumbnail(url=client.user.avatar.url)
-  em.add_field(name="Ping", value=f"{system_latency} ms", inline=False)
-  em.add_field(name="Servers", value=f"{len(client.guilds)}", inline=True)
-  em.add_field(name="Users", value=f"{len(client.users)}", inline=True)
-  await channel.send(embed=em)
-  database=await incoming.find_one({"_id": "All"})
-  if database:
-    list_of_ids = database.get("ids", [])  # Use get to handle the case where 'ids' is not present
-    for message_id in list_of_ids:
-        client.add_view(ubuttons.Qrscontrol, message_id=message_id)
-  else:
-    print("No document found with _id='All'")
-  client.add_view(ubuttons.answercontrol())
-  print(colored("[+] Persistent View ", "light_blue"))
-  await client.tree.sync()
+    os.system("clear")
+    font = Figlet(font="standard")
+    print(colored(font.renderText(client.user.name), "blue"))
+    print(colored(f"[+] Logged in as {client.user} (ID: {client.user.id})", "blue"))
+    print(colored(f"[+] Connected to {len(client.guilds)} servers", "blue"))
+    print(colored(f"[+] Available to {len(client.users)} users", "blue"))
+    print(
+        colored(
+            f"[+] Memory usage: {psutil.Process().memory_info().rss / 1024 ** 2:.2f} MB",
+            "light_blue",
+        )
+    )
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            try:
+                await client.load_extension(f"cogs.{filename[:-3]}")
+                print(colored(f"[+] {filename}", "green"))
+            except Exception as e:
+                print(colored(f"[-] Not Loaded {filename}\n {e}", "red"))
+    print(colored("[+] All available cogs loaded", "blue"))
+    # Send an initial message to a specific channel on startup
+    channel = client.get_channel(953571969780023366)  # Replace with your channel ID
+    system_latency = round(client.latency * 1000)
+    em = dembed(title=f"{client.user.name} Online!", description="I'm Up")
+    em.set_thumbnail(url=client.user.avatar.url)
+    em.add_field(name="Ping", value=f"{system_latency} ms", inline=False)
+    em.add_field(name="Servers", value=f"{len(client.guilds)}", inline=True)
+    em.add_field(name="Users", value=f"{len(client.users)}", inline=True)
+    await channel.send(embed=em)
+    database = await incoming.find_one({"_id": "All"})
+    if database:
+        list_of_ids = database.get(
+            "ids", []
+        )  # Use get to handle the case where 'ids' is not present
+        for message_id in list_of_ids:
+            client.add_view(ubuttons.Qrscontrol, message_id=message_id)
+    else:
+        print("No document found with _id='All'")
+    client.add_view(ubuttons.answercontrol())
+    print(colored("[+] Persistent View ", "light_blue"))
+    await client.tree.sync()
+
 
 keep_alive()
 client.run(os.environ["token"], reconnect=True)

@@ -15,11 +15,13 @@ from reactionmenu import ViewMenu, ViewButton
 class Language(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
+
     language_options = funcs.language_dict
-    
+
     # In the grammar command function
     language_choices = [
-        app_commands.Choice(name=lang["name"], value=lang["longCode"]) for lang in language_options
+        app_commands.Choice(name=lang["name"], value=lang["longCode"])
+        for lang in language_options
     ]
     group = app_commands.Group(
         name="language", description="Execute language-related commands."
@@ -28,11 +30,13 @@ class Language(commands.Cog):
     @group.command(name="grammar")
     @app_commands.choices(language=language_choices)
     @app_commands.describe(query_text="The message to check for grammar errors.")
-    async def grammar(self, ctx, query_text: str,*,language:app_commands.Choice[str]):
+    async def grammar(
+        self, ctx, query_text: str, *, language: app_commands.Choice[str]
+    ):
         await ctx.response.defer()
         try:
             if not language:
-              language.value="en"
+                language.value = "en"
             url = "https://dnaber-languagetool.p.rapidapi.com/v2/check"
             payload = {"language": language.value, "text": query_text}
             headers = {
@@ -60,7 +64,7 @@ class Language(commands.Cog):
                 error_category = match["rule"]["category"]["name"]
                 offset = match["context"]["offset"]
                 length = match["context"]["length"]
-                error_context = query_text[offset: offset + length]
+                error_context = query_text[offset : offset + length]
                 text = f"""
             ## {message}
             ### **Description** : {description}
@@ -123,7 +127,7 @@ class Language(commands.Cog):
                     try:
                         definition_text = definition["definition"]
                         definition_parts = [
-                            definition_text[i: i + 1000]
+                            definition_text[i : i + 1000]
                             for i in range(0, len(definition_text), 1000)
                         ]
                         for part in definition_parts:
@@ -135,8 +139,12 @@ class Language(commands.Cog):
                         name=meaning["partOfSpeech"], value=field_value, inline=False
                     )
 
-            all_synonyms = [x for meaning in d[0]["meanings"] for x in meaning.get("synonyms", [])]
-            all_antonyms = [y for meaning in d[0]["meanings"] for y in meaning.get("antonyms", [])]
+            all_synonyms = [
+                x for meaning in d[0]["meanings"] for x in meaning.get("synonyms", [])
+            ]
+            all_antonyms = [
+                y for meaning in d[0]["meanings"] for y in meaning.get("antonyms", [])
+            ]
 
             if all_synonyms:
                 embed.add_field(
@@ -148,7 +156,7 @@ class Language(commands.Cog):
                 )
 
             await ctx.followup.send(embed=embed)
-            
+
         except:
             await ctx.followup.send(
                 embed=dembed(

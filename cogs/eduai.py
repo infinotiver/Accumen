@@ -24,6 +24,7 @@ class EduAI(commands.Cog):
         self.bot = bot
 
     group = app_commands.Group(name="eduai", description="artificial intelligence")
+
     # Highly fatal , random generations
     @group.command(name="chat", description="Talk to ai")
     async def chat(self, ctx, text: str):

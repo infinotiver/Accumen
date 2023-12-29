@@ -33,7 +33,7 @@ class SelfNotes(commands.Cog):
         embed = dembed(title=title, description=description)
         await ctx.followup.send(embed=embed)
 
-    notes= app_commands.Group(name="notes",description="blah")
+    notes = app_commands.Group(name="notes", description="blah")
 
     @notes.command(name="view", description="Shows your saved notes")
     async def view(self, ctx):
@@ -43,7 +43,9 @@ class SelfNotes(commands.Cog):
         async for note in notes_cursor:
             notes.append(note)
         if not notes:
-            await ctx.followup.send( "Notes", f"{ctx.user.mention} has no saved notes yet...")
+            await ctx.followup.send(
+                "Notes", f"{ctx.user.mention} has no saved notes yet..."
+            )
             return
 
         embed = dembed(title="Your Notes", description="Here are your notes")
@@ -52,8 +54,7 @@ class SelfNotes(commands.Cog):
             message = note["note"]
             embed.add_field(name=category, value=message, inline=False)
 
-        await ctx.followup.send(embed=embed,ephmeral=True)
-        
+        await ctx.followup.send(embed=embed, ephmeral=True)
 
     @notes.command(name="add", description="Adds a note to the selected category")
     @app_commands.choices(
@@ -69,7 +70,9 @@ class SelfNotes(commands.Cog):
         new_note = {"id": ctx.user.id, "category": category, "note": message}
         notedb.insert_one(new_note)
 
-        await ctx.followup.send(embed=dembed(title="New Note",description= "Your note has been stored."))
+        await ctx.followup.send(
+            embed=dembed(title="New Note", description="Your note has been stored.")
+        )
 
     @notes.command(name="delete", description="Deletes a note")
     async def delete(self, ctx, note_id: int):
@@ -83,9 +86,16 @@ class SelfNotes(commands.Cog):
 
             await notedb.delete_one(note)
 
-            await ctx.followup.send(embed=dembed(title="Note Deleted",description= f"Deleted note from category `{category}`:\n{message}"))
+            await ctx.followup.send(
+                embed=dembed(
+                    title="Note Deleted",
+                    description=f"Deleted note from category `{category}`:\n{message}",
+                )
+            )
         else:
-            await ctx.followup.send( "Invalid Note ID")
+            await ctx.followup.send("Invalid Note ID")
+
+
 """
     @notes.command(name="categories", description="Shows available categories")
     async def categories(self, ctx):
@@ -97,6 +107,7 @@ class SelfNotes(commands.Cog):
 
         await ctx.followup.send(embed=embed)
 """
+
+
 async def setup(bot):
     await bot.add_cog(SelfNotes(bot))
-
