@@ -29,32 +29,13 @@ def dembed(
     url: str = None,
     preset: str = None,
     footer: Union[str] = None,
+    color:str=theme
 ) -> discord.Embed:
     embed = discord.Embed()
-
-    # Automatically assign color based on NLTK analysis and presets
-    if description and isinstance(description, str):
-        tokens = nltk.word_tokenize(description.lower())
-        if any(word in tokens for word in ["warning", "alert"]):
-            embed.color = warning_color
-            if not footer:
-                footer = "⚠️ Warning"
-        elif any(word in tokens for word in ["error", "critical"]):
-            embed.color = error_color
-            if not footer:
-                footer = "❌ Error"
-        elif any(word in tokens for word in ["success", "successful"]):
-            embed.color = success_color
-            if not footer:
-                footer = "✅ Success"
-        elif any(word in tokens for word in ["mild", "minor"]):
-            embed.color = mild_error_color
-            if not footer:
-                footer = "🟠 Mild Error"
-        elif any(word in tokens for word in ["info", "information"]):
-            embed.color = info_color
-            if not footer:
-                footer = "ℹ️ Information"
+    if color != theme:
+     if isinstance(color, str):
+       color = int(color.replace("#", "0x"), base=16)
+     embed = discord.Embed(color=color)
 
     if title:
         embed.title = title
