@@ -206,7 +206,7 @@ class Atlas(commands.Cog):
                 inline=False,
             )
             game_embed.add_field(
-                name="Announcement Time", value=f"<t:{announced}:F>", inline=False
+                name="Announcement Time", value=f"<t:{announce}:F>", inline=False
             )
             game_embed.add_field(
                 name="Start Time", value=f"<t:{started}:FF>", inline=False
