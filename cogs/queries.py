@@ -31,9 +31,7 @@ incoming = cluster["accumen"]["incoming"]
 def delete_everything():
     queries_col.delete_many({})
     print("Deleted Everything")
-
-
-delete_everything()
+#delete_everything()
 SUBJECTS = {
     "Languages": "language",
     "Mathematics": "mathematics",
@@ -155,13 +153,16 @@ class Assist(commands.Cog):
         embed.set_author(name=authr, icon_url=ctx.user.avatar.url)
         embed.add_field(name="Upvotes", value="0")
         embed.add_field(name="Category", value=f"`{category.name}`")
-        embed.add_field(name="Reward", value="Work In Progress")
+        embed.add_field(name="Reward", value="20 XP")
         timestamp = format_dt(ctx.created_at, "R")
         des = f"Query ID: **{id}** ∙ Posted in {ctx.guild.name} , {timestamp}\n{divider}\n **{description}**"
         embed.description = des
+        xp_message=await funcs.add_xp(ctx.user.id,50)
+        if xp_message:
+          await ctx.followup.send(embed=xp_message)
         sent_embed = dembed(
             title="Query posted",
-            description="Keep your direct messages open to receive answers.",
+            description="Keep your direct messages open to receive answers.\nYou earned 50 xp to post a query",
             color=funcs.secondary_theme,
         )
         sent_embed.add_field(name="Query", value=title, inline=False)
@@ -260,8 +261,10 @@ class Assist(commands.Cog):
         embed = dembed(title="New Answer", description=des, color=theme)
         embed.set_author(name=ctx.user.name, icon_url=ctx.user.avatar.url)
         embed.set_footer(text=f"{str(ctx.user.name)} [{str(ctx.user.id)}]")
-
-        await ctx.followup.send(embed=dembed(description="Query answered successfully"))
+        xp_message=await funcs.add_xp(ctx.user.id,20)
+        if xp_message:
+          await ctx.followup.send(embed=xp_message)
+        await ctx.followup.send(embed=dembed(description="Query answered successfully\nYou earned 20 XP"))
         # Send a DM to the asker with the new answer
         if original_questioner_id:
             try:
