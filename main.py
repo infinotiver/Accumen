@@ -56,15 +56,9 @@ async def on_ready():
     em.add_field(name="Servers", value=f"{len(client.guilds)}", inline=True)
     em.add_field(name="Users", value=f"{len(client.users)}", inline=True)
     await channel.send(embed=em)
-    database = await incoming.find_one({"_id": "All"})
-    if database:
-        list_of_ids = database.get(
-            "ids", []
-        )  # Use get to handle the case where 'ids' is not present
-        for message_id in list_of_ids:
-            client.add_view(ubuttons.Qrscontrol, message_id=message_id)
-    else:
-        print("No document found with _id='All'")
+    client.add_dynamic_items(ubuttons.dynamic_add_answer)
+    client.add_dynamic_items(ubuttons.dynamic_upvote)
+    client.add_dynamic_items(ubuttons.dynamic_report)
     client.add_view(ubuttons.answercontrol())
     print(colored("[+] Persistent View ", "light_blue"))
     await client.tree.sync()

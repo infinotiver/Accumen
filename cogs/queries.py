@@ -155,7 +155,7 @@ class Assist(commands.Cog):
         embed.add_field(name="Category", value=f"`{category.name}`")
         embed.add_field(name="Reward", value="20 XP")
         timestamp = format_dt(ctx.created_at, "R")
-        des = f"Query ID: **{id}** ∙ Posted in {ctx.guild.name} , {timestamp}\n{divider}\n **{description}**"
+        des = f"**{id}** ∙ Posted in {ctx.guild.name} , {timestamp}\n{divider}\n **{description}**"
         embed.description = des
         xp_message=await funcs.add_xp(ctx.user.id,50)
         if xp_message:
@@ -173,7 +173,7 @@ class Assist(commands.Cog):
                 guild = await self.bot.fetch_guild(int(x["_id"]))
                 channel = self.bot.get_channel(int(x["channel"]))
 
-                view = assetsb.Qrscontrol()
+                view =  discord.ui.View(timeout=None)
                 view.add_item(
                     discord.ui.Button(
                         label="Community",
@@ -181,6 +181,9 @@ class Assist(commands.Cog):
                         url="https://discord.gg/Nvts32BAwr",
                     )
                 )
+                view.add_item(assetsb.dynamic_add_answer(ctx.user.id))
+                view.add_item(assetsb.dynamic_upvote(ctx.user.id))
+                view.add_item(assetsb.dynamic_report(ctx.user.id))
                 msg = await channel.send(
                     content="### New Query", embed=embed, view=view
                 )
@@ -191,18 +194,9 @@ class Assist(commands.Cog):
                 )
                 await queries_col.replace_one({"_id": id}, fq)
                 view.message = msg
-                storage = await incoming.find_one({"_id": "All"})
-                if not storage:
-                    query = {"_id": "All", "ids": []}
-                    await incoming.insert_one(query)
-                storage = await incoming.find_one({"_id": "All"})
-                storage["ids"].append(msg.id)
-                await incoming.update_one(
-                    {"_id": "All"}, {"$set": {"ids": storage["ids"]}}
-                )
                 self.bot.add_view(view)
-            except:
-                pass
+            except Exception as e:
+                print(e)
         oview = discord.ui.View(timeout=None)
         oview.add_item(
             discord.ui.Button(
@@ -239,6 +233,9 @@ class Assist(commands.Cog):
                     embed=dembed(description="You have already answered this query.")
                 )
                 return
+        if user_id==query.get("user_id"):
+            await ctx.followup.send( embed=dembed(description="You cannot answer your own query."))
+            return
         # Add the answer to the query document
         if "answers" not in query:
             query["answers"] = []
@@ -272,10 +269,10 @@ class Assist(commands.Cog):
                 await original_questioner_id.send(
                     "New Answer Received 📩", embed=embed, view=view
                 )
-            except:
-                print("Cant send message to original questioner")
+            except Exception as e :
+                print(f"Cant send message to original questioner {e}")
 
-    @group.command(name="list", description="Checkout")
+    @group.command(name="list", description="List all the queries")
     @app_commands.choices(category=subject_choices)
     @app_commands.choices(difficulty=education_level_choices)
     @app_commands.choices(status=status_choices)
@@ -493,7 +490,7 @@ class Assist(commands.Cog):
     )
     @commands.has_permissions(manage_messages=True)
     async def incomingset(
-        self, ctx, channel: discord.TextChannel = None, *, disable: bool = False
+        self, ctx,*, channel: discord.TextChannel = None,  disable: bool = False
     ):
         await ctx.response.defer()
         if not disable:
