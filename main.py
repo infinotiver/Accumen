@@ -63,6 +63,6 @@ async def on_ready():
     print(colored("[+] Persistent View ", "light_blue"))
     await client.tree.sync()
 
-
+# Add credit and thanks for hosting
 keep_alive()
 client.run(os.environ["token"], reconnect=True)
