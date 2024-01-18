@@ -30,7 +30,7 @@ async def on_ready():
     os.system("clear")
     font = Figlet(font="standard")
     print(colored(font.renderText(client.user.name), "blue"))
-    print(colored(f"[+] Logged in as {client.user} (ID: {client.user.id})", "blue"))
+    print(colored(f"[+] Signed in as {client.user} (ID: {client.user.id})", "blue"))
     print(colored(f"[+] Connected to {len(client.guilds)} servers", "blue"))
     print(colored(f"[+] Available to {len(client.users)} users", "blue"))
     print(
@@ -43,14 +43,13 @@ async def on_ready():
         if filename.endswith(".py"):
             try:
                 await client.load_extension(f"cogs.{filename[:-3]}")
-                print(colored(f"[+] {filename}", "green"))
+                print(colored(f"[+] {filename}", "light_green"))
             except Exception as e:
                 print(colored(f"[-] Not Loaded {filename}\n {e}", "red"))
-    print(colored("[+] All available cogs loaded", "blue"))
-    # Send an initial message to a specific channel on startup
-    channel = client.get_channel(953571969780023366)  # Replace with your channel ID
+    print(colored("[+] All stable cogs loaded", "blue"))
+    channel = client.get_channel(1197514010388611102)  
     system_latency = round(client.latency * 1000)
-    em = dembed(title=f"{client.user.name} Online!", description="I'm Up")
+    em = dembed(title=f"{client.user.name} is online !")
     em.set_thumbnail(url=client.user.avatar.url)
     em.add_field(name="Ping", value=f"{system_latency} ms", inline=False)
     em.add_field(name="Servers", value=f"{len(client.guilds)}", inline=True)
@@ -60,7 +59,7 @@ async def on_ready():
     client.add_dynamic_items(ubuttons.dynamic_upvote)
     client.add_dynamic_items(ubuttons.dynamic_report)
     client.add_view(ubuttons.answercontrol())
-    print(colored("[+] Persistent View ", "light_blue"))
+    print(colored("[+] Persistent views and Dynamic items ", "light_blue"))
     await client.tree.sync()
 
 # Add credit and thanks for hosting

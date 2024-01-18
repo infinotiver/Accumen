@@ -48,13 +48,13 @@ class dynamic_add_answer(discord.ui.DynamicItem[discord.ui.Button], template=r'p
   def __init__(self, user_id: int) -> None:
       super().__init__(
           discord.ui.Button(
-              label="Add an Answer",
+              label="Answer",
               style=discord.ButtonStyle.success,
-              emoji="✒",
+              emoji="📄",
               custom_id=f'persistent_view:answer:user:{user_id}',
           )
       )
-      self.user_id: int = user_id
+      
 
   # This is called when the button is clicked and the custom_id matches the template.
   @classmethod
@@ -62,15 +62,14 @@ class dynamic_add_answer(discord.ui.DynamicItem[discord.ui.Button], template=r'p
       user_id = int(match['id'])
       return cls(user_id)
 
-  async def interaction_check(self, interaction: discord.Interaction) -> bool:
-      return interaction.user.id == self.user_id
+
 
   async def callback(self, interaction: discord.Interaction) -> None:
       msg_id=interaction.message.id
       query = await queries_col.find_one({"messages": {"$elemMatch": {"msg": msg_id}}})
       query_id=query["_id"]
       await interaction.response.send_message(
-          f"Use command\n**</query answer:1085572802976952340> id {query_id}**",
+          f"Use command\n**</query answer:1085572802976952340> id {query_id}**\nModal boxes for answers coming soon...",
           ephemeral=True,
       )
 class dynamic_upvote(discord.ui.DynamicItem[discord.ui.Button], template=r'persistent_view:vote:user:(?P<id>[0-9]+)'):
@@ -83,7 +82,7 @@ class dynamic_upvote(discord.ui.DynamicItem[discord.ui.Button], template=r'persi
               custom_id=f'persistent_view:vote:user:{user_id}',
           )
       )
-      self.user_id: int = user_id
+      
 
   # This is called when the button is clicked and the custom_id matches the template.
   @classmethod
@@ -91,8 +90,7 @@ class dynamic_upvote(discord.ui.DynamicItem[discord.ui.Button], template=r'persi
       user_id = int(match['id'])
       return cls(user_id)
 
-  async def interaction_check(self, interaction: discord.Interaction) -> bool:
-      return interaction.user.id == self.user_id
+
 
   async def callback(self, interaction: discord.Interaction) -> None:
       msg_id=interaction.message.id
@@ -104,13 +102,13 @@ class dynamic_upvote(discord.ui.DynamicItem[discord.ui.Button], template=r'persi
           query["votes"] -= 1
           voted_users.remove(interaction.user.id)
           await interaction.response.send_message(
-              embed=funcs.dembed(description="Removed vote"), ephemeral=True
+              embed=funcs.dembed(description="Removed your vote"), ephemeral=True
           )
       else:
           query["votes"] += 1
           voted_users.append(interaction.user.id)
           await interaction.response.send_message(
-              embed=funcs.dembed(description="Added vote"), ephemeral=True
+              embed=funcs.dembed(description="Added your vote"), ephemeral=True
           )
   
       await queries_col.replace_one({"_id": query_id}, query)
@@ -140,37 +138,34 @@ class dynamic_report(discord.ui.DynamicItem[discord.ui.Button], template=r'persi
           discord.ui.Button(
               label="Report",
               style=discord.ButtonStyle.red,
-              emoji="🛑",
+              emoji="🚨",
               custom_id=f'persistent_view:report:user:{user_id}',
           )
       )
-      self.user_id: int = user_id
+      
 
-  # This is called when the button is clicked and the custom_id matches the template.
+  
   @classmethod
   async def from_custom_id(cls, interaction: discord.Interaction, item: discord.ui.Button, match: re.Match[str], /):
       user_id = int(match['id'])
       return cls(user_id)
 
-  async def interaction_check(self, interaction: discord.Interaction) -> bool:
-      return interaction.user.id == self.user_id
+
 
   async def callback(self, interaction: discord.Interaction) -> None:
       msg_id=interaction.message.id
-      print(interaction.message.embeds[0].description)
       query = await queries_col.find_one({"messages": {"$elemMatch": {"msg": msg_id}}})
       query_id=query["_id"]
-      channel=await interaction.client.get_channel(os.environ["contro"])
       title=query["title"]
       description=query["description"]
       difficulty=query["difficulty"]
       user=query["user_id"]
       upvotes=query["votes"]
       category=query["category"]
-      embed = discord.Embed(title=f"**{title}**",description=description, color=theme)
+      embed = discord.Embed(title=f"**{title}**",description=description, color=funcs.theme)
       authr = f"{user} ∙ {difficulty}"
-      embed.set_author(name=interaction.author, icon_url=interaction.avatar.url)
-      embed.add_field(name="Upvotes", value=votes)
+      embed.set_author(name=interaction.user, icon_url=interaction.user.avatar.url)
+      embed.add_field(name="Upvotes", value=upvotes)
       embed.add_field(name="Category", value=f"`{category}`")
-      await channel.send("Report requested",embed=embed)
-      await interaction.response.send_message("Requested")
+      await interaction.client.get_channel(979345665081610271).send(f" {interaction.user.mention} Reported the following query",embed=embed)
+      await interaction.response.send_message("Sent the report to the bot moderators")

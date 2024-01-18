@@ -48,32 +48,6 @@ class Accumen(commands.Cog):
             return "\n".join(content.split("\n")[1:-1])
 
         return content.strip("` \n")
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild):
-        embed = discord.Embed(
-            title="Joined a guild!",
-            description=f"{guild.name} \nOwner {guild.owner}",
-            color=theme,
-        )
-        embed.add_field(name="Server ID",value=guild.id)
-        embed.add_field(
-            name=f"This Guild Has {guild.member_count} Members!",
-            value=f"Yay Another Server! We Are Now At {len(self.bot.guilds)} Guilds!",
-        )
-        await self.bot.get_channel(os.environ["dev_channel"]).send(embed=embed)
-    @commands.Cog.listener()
-    async def on_guild_remove(self, guild):
-        embed = discord.Embed(
-            title="Removed from a guild!",
-            description=f"{guild.name} \nOwner {guild.owner}",
-            color=theme,
-        )
-        embed.add_field(name="Server ID",value=guild.id)
-        embed.add_field(
-            name=f"This Guild Had {guild.member_count} Members!",
-            value=f"We Are Now At {len(self.bot.guilds)} Guilds!",
-        )
-        await self.bot.get_channel(os.environ["dev_channel"]).send(embed=embed)
     @group.command(name="reboot", description="Reboot (Restart) the bot")
     @app_commands.choices(
         mode=[
@@ -209,3 +183,4 @@ class Accumen(commands.Cog):
           return
 async def setup(bot):
     await bot.add_cog(Accumen(bot))
+

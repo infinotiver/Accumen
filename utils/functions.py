@@ -17,11 +17,11 @@ theme = 0x01EAFE
 secondary_theme = 0x3E3AF5
 tertiary_theme = 0x271C41
 
-warning_color = 0xFFD700  # Yellow for warnings
-error_color = 0xFF0000  # Red for errors
-success_color = 0x00FF00  # Green for success messages
-mild_error_color = 0xFFA500  # Orange for mild errors
-info_color = 0x808080  # Gray for informational messages
+warning = 0xFFD700  # Yellow for warnings
+error = 0xFF0000  # Red for errors
+success = 0x00FF00  # Green for success messages
+mild_error = 0xFFA500  # Orange for mild errors
+info = 0x808080  # Gray for informational messages
 
 # Divider string
 divider = "<:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D3:1074952381667741786><:D3:1074952381667741786><:D3:1074952381667741786><:D3:1074952381667741786><:D3:1074952381667741786><:D5:1074952388500262922><:D5:1074952388500262922><:D5:1074952388500262922><:D5:1074952388500262922><:D5:1074952388500262922><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089><:D4:1074952383605506089>"
@@ -34,7 +34,7 @@ def dembed(
     picture: str = None,
     url: str = None,
     preset: str = None,
-    footer: Union[str] = None,
+    footer: Union[str] = "Hosting supported by @RedCoder ❤ https://austinf.me/ ",
     color: str = theme,
 ) -> discord.Embed:
     embed = discord.Embed()
@@ -66,6 +66,7 @@ def dembed(
         embed.url = url
     if footer:
         embed.set_footer(text=footer)
+
     if preset:
         if preset == "beta":
             embed.set_author(name="Accumen ∙ Beta Feature")
@@ -141,11 +142,4 @@ def extract_keyword(title, description):
 """
 
 
-def generate_query_id(user):
-    # Get the current timestamp
-    timestamp_str = str(int(datetime.datetime.now().timestamp()))
 
-    # Combine the keyword, random string, and timestamp to create the ID
-    query_id = f"{user}_{timestamp_str}"
-
-    return query_id

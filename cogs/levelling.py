@@ -75,7 +75,7 @@ class Levels(commands.Cog):
               if stats["id"] == x["id"]:
                   break
 
-          progress_bar = f"{int((xp / (200 * ((1 / 2) * lvl))) * 20) * '<:D4:1074952383605506089>'}{(20 - int((xp / (200 * ((1 / 2) * lvl))) * 20)) * '<:D5:1074952388500262922>'}"
+          progress_bar = f"{int((xp / (200 * ((1 / 2) * lvl))) * 20) * '<:D4:1074952383605506089>'}{(20 - int((xp / (200 * ((1 / 2) * lvl))) * 20)) * '<:D11:1128533232846131282>'}"
           card_settings = Settings(
               text_color="white",
               bar_color="#8a2be2",
@@ -106,7 +106,8 @@ class Levels(commands.Cog):
       rankings = levelling.find().sort("xp", -1)
       i = 1
       embed = dembed(
-          title="Rankings"
+          title="Rankings",
+          color=theme
       )
       async for x in rankings:
           try:
@@ -124,6 +125,7 @@ class Levels(commands.Cog):
       embed.set_footer(
           text=f"Requested By: {ctx.user.name}",
           icon_url=f"{ctx.user.avatar.url}",
+        
       )
     
       await ctx.channel.send(embed=embed)
