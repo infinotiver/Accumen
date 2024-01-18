@@ -157,9 +157,10 @@ class dynamic_report(discord.ui.DynamicItem[discord.ui.Button], template=r'persi
 
   async def callback(self, interaction: discord.Interaction) -> None:
       msg_id=interaction.message.id
+      print(interaction.message.embeds[0].description)
       query = await queries_col.find_one({"messages": {"$elemMatch": {"msg": msg_id}}})
       query_id=query["_id"]
-      channel=await self.bot.get_channel(os.environ["contro"])
+      channel=await interaction.client.get_channel(os.environ["contro"])
       title=query["title"]
       description=query["description"]
       difficulty=query["difficulty"]
