@@ -48,7 +48,7 @@ async def on_ready():
                 print(colored(f"[-] Not Loaded {filename}\n {e}", "red"))
     print(colored("[+] All available cogs loaded", "blue"))
     # Send an initial message to a specific channel on startup
-    channel = client.get_channel(953571969780023366)  # Replace with your channel ID
+    channel = client.get_channel(1197514010388611102)  # Replace with your channel ID
     system_latency = round(client.latency * 1000)
     em = dembed(title=f"{client.user.name} Online!", description="I'm Up")
     em.set_thumbnail(url=client.user.avatar.url)
