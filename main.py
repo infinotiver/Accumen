@@ -17,9 +17,10 @@ import motor.motor_asyncio
 import nest_asyncio
 import typing
 import asyncio
-
+import datetime
+import time
 intents = discord.Intents.all()
-client = commands.Bot(command_prefix="a!", intents=intents)
+client = commands.Bot(command_prefix="a!", intents=intents,owner_id=900992402356043806)
 mongo_url = os.environ["mongodb"]
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 incoming = cluster["accumen"]["incoming"]
@@ -48,20 +49,36 @@ async def on_ready():
                 print(colored(f"[-] Not Loaded {filename}\n {e}", "red"))
 
     system_latency = round(client.latency * 1000)
+    view=ubuttons.contro()
     em = dembed(title=f"{client.user.name} is online !")
     em.set_thumbnail(url=client.user.avatar.url)
     em.add_field(name="Ping", value=f"{system_latency} ms", inline=False)
     em.add_field(name="Servers", value=f"{len(client.guilds)}", inline=True)
+    last_server_count=len(client.guilds)
     em.add_field(name="Users", value=f"{len(client.users)}", inline=True)
     channel=client.get_channel(1197514010388611102)
-    await channel.send(embed=em)
+    await channel.purge(limit=100) 
+    msg=await channel.send(embed=em,view=view)
     client.add_dynamic_items(ubuttons.dynamic_add_answer)
     client.add_dynamic_items(ubuttons.dynamic_upvote)
     client.add_dynamic_items(ubuttons.dynamic_report)
     client.add_view(ubuttons.answercontrol())
     print(colored("[+] Persistent views and Dynamic items ", "light_blue"))
-    await client.tree.sync()
+    GUILDID =976878887004962917 
 
-# Add credit and thanks for hosting
+    await client.tree.sync(guild=discord.Object(GUILDID))
+    await client.tree.sync()
+    while True:
+      await asyncio.sleep(300)
+      current_server_count=len(client.guilds)
+      change=current_server_count-last_server_count
+      last_server_count=current_server_count
+      em.set_field_at(index=1, name="Servers", value=f"{len(client.guilds)} ({change})")
+      ctime=datetime.datetime.now()
+      unixtime = time.mktime(ctime.timetuple())
+      em.description=f"\n last updated <t:{int(unixtime)}:R>"
+      em.set_footer(text=f"Last Updated {ctime}")
+      await msg.edit(embed=em,view=view)
+
 
 client.run(os.environ["token"], reconnect=True)
