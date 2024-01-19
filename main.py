@@ -53,6 +53,7 @@ async def on_ready():
     em.add_field(name="Ping", value=f"{system_latency} ms", inline=False)
     em.add_field(name="Servers", value=f"{len(client.guilds)}", inline=True)
     em.add_field(name="Users", value=f"{len(client.users)}", inline=True)
+    channel=client.get_channel(1197514010388611102)
     await channel.send(embed=em)
     client.add_dynamic_items(ubuttons.dynamic_add_answer)
     client.add_dynamic_items(ubuttons.dynamic_upvote)
@@ -62,5 +63,5 @@ async def on_ready():
     await client.tree.sync()
 
 # Add credit and thanks for hosting
-keep_alive()
+
 client.run(os.environ["token"], reconnect=True)
