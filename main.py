@@ -46,8 +46,7 @@ async def on_ready():
                 print(colored(f"[+] {filename}", "light_green"))
             except Exception as e:
                 print(colored(f"[-] Not Loaded {filename}\n {e}", "red"))
-    print(colored("[+] All stable cogs loaded", "blue"))
-    channel = client.get_channel(1197514010388611102)  
+
     system_latency = round(client.latency * 1000)
     em = dembed(title=f"{client.user.name} is online !")
     em.set_thumbnail(url=client.user.avatar.url)
