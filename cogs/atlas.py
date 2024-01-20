@@ -32,7 +32,14 @@ async def fetch_data(place=None):
         all_locations = []
         for country in data:
             all_locations.append(country["name"])
-
+        all_locations.append("Asia")
+        all_locations.append("Africa")
+        all_locations.append("Europe")
+        all_locations.append("North America")
+        all_locations.append("South America")
+        all_locations.append("Oceania")
+        all_locations.append("Antarctica")
+        all_locations.append("Australia")
         if not place:
             return all_locations
         else:
@@ -67,7 +74,7 @@ class Atlas(commands.Cog):
         embed = discord.Embed(
             title="ATLAS Announcement",
             description=(
-                f"\nAllowed Places\n* Countries\n* ~~States~~\n* ~~Cities~~\n* ~~Continents~~\nStates and Cities coming soon...\n"
+                f"\nAllowed Places\n* Countries\n*Continent\n ~~States~~\n* ~~Cities~~\n* \nStates and Cities coming soon...\n"
                 f"{divider}\n Interested members use /game-enter command"
             ),
             color=theme,
@@ -98,8 +105,7 @@ class Atlas(commands.Cog):
             return await ctx.followup.send("This is not the game channel")
         elif len(self.games[str(ctx.guild.id)]["users"]) > 5:
             return await ctx.followup.send(
-                "Currently , more than 5 participants can not play."
-            )
+                "Currently , more than 5 participants can not play.")
         else:
             self.games[str(ctx.guild.id)]["users"].append(ctx.user.id)
             channel = await self.bot.fetch_channel(
@@ -107,7 +113,9 @@ class Atlas(commands.Cog):
             )
             msg = await channel.fetch_message(self.games[str(ctx.guild.id)]["message"])
             print(msg.embeds[0])
-
+            embed = msg.embeds[0]
+            embed.description += f"\n{ctx.user.mention} has joined the game"
+            await msg.edit(embed=embed)
             await ctx.followup.send("You have entered the game")
 
     @atlas.command(name="game-start", description="Start a game of ATLAS")
@@ -125,12 +133,17 @@ class Atlas(commands.Cog):
             return await ctx.followup.send(
                 embed=dembed(description="Insufficient members for game")
             )
+        elif self.games[str(ctx.guild.id)]["time"]["started"] != 0:
+            return await ctx.followup.send(
+              embed=dembed(description="Game has already started",ephemeral=True)
+            )
         else:
+      
             self.games[str(ctx.guild.id)]["time"][
                 "started"
             ] = ctx.created_at.timestamp()
             order = self.games[str(ctx.guild.id)]["users"].copy()
-            original_order = self.games[str(ctx.guild.id)]["users"].copy()
+            original_order = self.games[str(ctx.guild.id)]["users"  ].copy()
             player_index = 0
             current_alphabet = "S"
             player = await self.bot.fetch_user(order[player_index])
@@ -138,53 +151,55 @@ class Atlas(commands.Cog):
                 title="ATLAS Started",
                 description=f"{player.mention} Type a place that starts with: **{current_alphabet}**",
                 color=theme,
-            )
-            message = await ctx.followup.send(embed=embed)
+            )         
+            while len(order) > 1: 
 
-            def check(msg):
-                return msg.author.id == player.id
+                message = await ctx.followup.send(embed=embed)
+          
+                def check(msg):
+                    return msg.author.id == player.id
 
-            try:
-                input = await self.bot.wait_for("message", check=check, timeout=30)
-                input_content = input.content.strip().upper()
-                check_result = await fetch_data(input_content)
-            except asyncio.TimeoutError:
-                await ctx.followup.send(
-                    embed=dembed(
-                        description=f"{player.mention} timed out and has been disqualified"
-                    )
-                )
-                order.remove(player.id)
-            else:
-                if input.content[0].upper() != current_alphabet:
+                try:
+                    input = await self.bot.wait_for("message", check=check, timeout=30)
+                    input_content = input.content.strip().upper()
+                    check_result = await fetch_data(input_content)
+                except asyncio.TimeoutError:
                     await ctx.followup.send(
                         embed=dembed(
-                            description=f"{player.mention} input does not start with the correct letter and has been disqualified"
-                        )
-                    )
-                    order.remove(player.id)
-                elif not check_result:
-                    await ctx.followup.send(
-                        embed=dembed(
-                            description=f"{player.mention} entered an invalid place and has been disqualified"
+                            description=f"{player.mention} timed out and has been disqualified"
                         )
                     )
                     order.remove(player.id)
                 else:
-                    current_alphabet = input_content[-1]
-                    player_index = (player_index + 1) % len(order)
-                    self.games[str(ctx.guild.id)]["places_done"].append(input.content)
-                    try:
-                        await input.delete()
-                    except:
-                        pass
-                    await message.edit(
-                        embed=dembed(
-                            title="ATLAS Started",
-                            description=f"{player.mention} Type a place that starts with: **{current_alphabet}**",
-                            color=theme,
+                    if input.content[0].upper() != current_alphabet:
+                        await ctx.followup.send(
+                            embed=dembed(
+                                description=f"{player.mention} input does not start with the correct letter and has been disqualified"
+                            )
                         )
-                    )
+                        order.remove(player.id)
+                    elif not check_result:
+                        await ctx.followup.send(
+                            embed=dembed(
+                                description=f"{player.mention} entered an invalid place and has been disqualified"
+                            )
+                        )
+                        order.remove(player.id)
+                    else:
+                        current_alphabet = input_content[-1]  # Change current_alphabet to last letter of place if msg is valid
+                        player_index = (player_index + 1) % len(order)
+                        self.games[str(ctx.guild.id)]["places_done"].append(input.content)
+                        try:
+                            await input.delete()
+                        except:
+                            pass
+                        await message.edit(
+                            embed=dembed(
+                                title="ATLAS in progress",
+                                description=f"{player.mention} Type a place that starts with: **{current_alphabet}**",
+                                color=theme,
+                            )
+                        )
             winner = await self.bot.fetch_user(order[0])
             self.games[str(ctx.guild.id)]["time"]["ended"] = ctx.created_at.timestamp()
             game_embed = dembed(
@@ -209,7 +224,7 @@ class Atlas(commands.Cog):
                 name="Announcement Time", value=f"<t:{announce}:F>", inline=False
             )
             game_embed.add_field(
-                name="Start Time", value=f"<t:{started}:FF>", inline=False
+                name="Start Time", value=f"<t:{started}:F>", inline=False
             )
             game_embed.add_field(name="End Time", value=f"<t:{ended}:R>", inline=False)
             await ctx.followup.send(embed=game_embed)
@@ -217,6 +232,7 @@ class Atlas(commands.Cog):
             await ctx.followup.send(
                 embed=dembed(description=f"Game Ended. The winner is {winner.mention}")
             )
+
 
 
 async def setup(bot):

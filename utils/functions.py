@@ -38,7 +38,7 @@ def dembed(
     color: str = theme,
 ) -> discord.Embed:
     embed = discord.Embed()
-    if color != theme:
+    if color:
         if isinstance(color, str):
             color = int(color.replace("#", "0x"), base=16)
         embed = discord.Embed(color=color)
