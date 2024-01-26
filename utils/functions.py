@@ -8,7 +8,7 @@ import nest_asyncio
 import random
 import os
 nest_asyncio.apply()
-mongo_url = os.environ["mongodb"]
+mongo_url = os.environ.get("mongodb")
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 levelling = cluster["accumen"]["level"]
 #nltk.download("stopwords")

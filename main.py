@@ -21,7 +21,7 @@ import datetime
 import time
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="a!", intents=intents,owner_id=900992402356043806)
-mongo_url = os.environ["mongodb"]
+mongo_url = os.environ.get("mongodb")
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 incoming = cluster["accumen"]["incoming"]
 
@@ -81,6 +81,6 @@ async def on_ready():
       await msg.edit(embed=em,view=view)
 
 
-client.run(os.environ["token"], reconnect=True)
+client.run(os.environ.get("token"), reconnect=True)
 
 # Trying something
