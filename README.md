@@ -14,6 +14,11 @@ With Accumen, you can get quick and accurate answers to all your academic querie
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/infinotiver/Accumen)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/infinotiver/Accumen)
 
+
+
+View glimpses at...
+https://youtu.be/azKoKSETLks
+
 ## 🌐 Features
 
 - **Query System**: Ask questions from users from various servers and get best answers
