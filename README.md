@@ -10,7 +10,7 @@
 Welcome to Accumen, your intelligent companion for Discord! Elevate your server experience with this multifaceted bot that brings innovation, engagement, and study-focused features. Whether you're a tech enthusiast, a student, or a scholar, Accumen is designed to enhance your learning community.
 With Accumen, you can get quick and accurate answers to all your academic queries. From math problems to grammar rules, Accumen has got you covered. And with personalized learning suggestions and study tips, you'll never miss a beat in your academic journey. Invite Accumen today and experience the power of knowledge at your fingertips!
 
-[![wakatime](https://wakatime.com/badge/user/b688c6f5-461e-4b60-ab21-c038b6b033ef/project/018d9d4d-f0fc-44d1-9071-6401663d9dda.svg)](https://wakatime.com/badge/user/b688c6f5-461e-4b60-ab21-c038b6b033ef/project/018d9d4d-f0fc-44d1-9071-6401663d9dda)
+
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/infinotiver/Accumen)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/infinotiver/Accumen)
 
