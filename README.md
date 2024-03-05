@@ -27,7 +27,6 @@ https://youtu.be/azKoKSETLks
 - **Much more**... Work In Progress
 - **Mathematics**: Mathematical operators, roman numbers, interactive calculator, wolfram and much more
 - **AI**: Unleash the power of AI with Accumen
-- 
 - [ ] **Badge System**: Earn badges based on your learning achievements and contributions.
 
 ## 🎓 Achievements
