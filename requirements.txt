@@ -1,0 +1,12 @@
+discord.py @git+https://github.com/Rapptz/discord.py@master
+motor==3.3.2
+nest_asyncio==1.5.1
+psutil==5.8.0
+pyfiglet==0.8.post1
+termcolor==2.4.0
+utils==1.0.2
+wikipedia==1.4.0
+reactionmenu==3.1.5
+Requests==2.31.0
+sympy==1.8
+DiscordLevelingCard==0.6.0
