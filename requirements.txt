@@ -1,4 +1,4 @@
-discord.py @git+https://github.com/Rapptz/discord.py@master
+discord.py
 motor==3.3.2
 nest_asyncio==1.5.1
 psutil==5.8.0
