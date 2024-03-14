@@ -40,7 +40,7 @@ async def on_ready():
             "light_blue",
         )
     )
-    for filename in os.listdir("./cogs"):
+    for filename in os.listdir("/cogs"):
         if filename.endswith(".py"):
             try:
                 await client.load_extension(f"cogs.{filename[:-3]}")
@@ -59,10 +59,11 @@ async def on_ready():
     channel=client.get_channel(1197514010388611102)
     await channel.purge(limit=100) 
     msg=await channel.send(embed=em,view=view)
-    client.add_dynamic_items(ubuttons.dynamic_add_answer)
-    client.add_dynamic_items(ubuttons.dynamic_upvote)
-    client.add_dynamic_items(ubuttons.dynamic_report)
+    #client.add_dynamic_items(ubuttons.dynamic_add_answer)
+    #client.add_dynamic_items(ubuttons.dynamic_upvote)
+    #client.add_dynamic_items(ubuttons.dynamic_report)
     client.add_view(ubuttons.answercontrol())
+    client.add_view(ubuttons.Qrscontrol())
     print(colored("[+] Persistent views and Dynamic items ", "light_blue"))
     GUILDID =976878887004962917 
 
@@ -80,7 +81,7 @@ async def on_ready():
       em.set_footer(text=f"Last Updated {ctime}")
       await msg.edit(embed=em,view=view)
 
-
+keep_alive()
 client.run(os.environ.get("token"), reconnect=True)
 
 # Trying something

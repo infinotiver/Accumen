@@ -173,7 +173,7 @@ class Assist(commands.Cog):
                 guild = await self.bot.fetch_guild(int(x["_id"]))
                 channel = self.bot.get_channel(int(x["channel"]))
 
-                view =  discord.ui.View(timeout=None)
+                view =  assetsb.Qrscontrol()
                 view.add_item(
                     discord.ui.Button(
                         label="Community",
@@ -181,9 +181,9 @@ class Assist(commands.Cog):
                         url="https://discord.gg/Nvts32BAwr",
                     )
                 )
-                view.add_item(assetsb.dynamic_add_answer(ctx.user.id))
-                view.add_item(assetsb.dynamic_upvote(ctx.user.id))
-                view.add_item(assetsb.dynamic_report(ctx.user.id))
+                #view.add_item(assetsb.dynamic_add_answer(ctx.user.id))
+                #view.add_item(assetsb.dynamic_upvote(ctx.user.id))
+                #view.add_item(assetsb.dynamic_report(ctx.user.id))
                 msg = await channel.send(
                     content="### New Query", embed=embed, view=view
                 )
