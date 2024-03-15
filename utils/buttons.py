@@ -5,7 +5,9 @@ import motor.motor_asyncio
 import nest_asyncio
 import os
 import discord.utils
-
+from dotenv import load_dotenv
+os.chdir("..")
+load_dotenv()
 nest_asyncio.apply()
 
 mongo_url = os.environ["mongodb"]

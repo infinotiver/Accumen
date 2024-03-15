@@ -19,6 +19,9 @@ import typing
 import asyncio
 import datetime
 import time
+from dotenv import load_dotenv
+os.chdir("..")
+load_dotenv()
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="a!", intents=intents,owner_id=900992402356043806)
 mongo_url = os.environ.get("mongodb")
