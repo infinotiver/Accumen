@@ -44,13 +44,11 @@ async def on_ready():
     base_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Construct the path to the "cogs" directory relative to the base directory
-    cogs_dir = os.path.join(base_dir, "Accumen", "cogs")  # Assuming "cogs" is within "Accumen" subdirectory
-
+    cogs_dir = os.path.join(base_dir,  "cogs")  # Assuming "cogs" is within "Accumen" subdirectory
+    
     print(cogs_dir)
-    for filename in cogs_dir:
-        print(filename)
+    for filename in os.listdir(cogs_dir):
         if filename.endswith(".py"):
-            
             try:
                 await client.load_extension(f"cogs.{filename[:-3]}")
                 print(colored(f"[+] {filename}", "light_green"))
