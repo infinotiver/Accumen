@@ -13,6 +13,27 @@ mongo_url = os.environ["mongodb"]
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 queries_col = cluster["accumen"]["queries"]
 incoming = cluster["accumen"]["incoming"]
+system=cluster["accumen"]["system"]
+class contro(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(
+        label="Stats",
+        style=discord.ButtonStyle.grey,
+        custom_id="stats",
+        emoji="📰",
+    )
+    async def stats(self, interaction: discord.Interaction, button: discord.ui.Button):
+        results = await system.find_one({"_id": "commands_usage"})
+        count=str(results["count"])
+        system_latency = round(interaction.client.latency * 1000)
+        embed=funcs.dembed(title="Stats",description=f"**Command Used:** {count}\n**Total Queries:** "+str(await queries_col.count_documents({})))
+        embed.set_thumbnail(url=interaction.client.user.avatar.url)
+        embed.add_field(name="Ping", value=f"{system_latency} ms", inline=False)
+        embed.add_field(name="Servers", value=f"{len(interaction.client.guilds)}", inline=True)
+        await interaction.response.send_message(embed=embed,ephemeral=True)
+
 class answercontrol(discord.ui.View):
   
   def __init__(self):

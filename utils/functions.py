@@ -34,7 +34,7 @@ def dembed(
     picture: str = None,
     url: str = None,
     preset: str = None,
-    footer: Union[str] = "Hosting supported by @RedCoder ❤ https://austinf.me/ ",
+    footer: str = "Accumen",
     color: str = theme,
 ) -> discord.Embed:
     embed = discord.Embed()

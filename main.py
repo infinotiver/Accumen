@@ -28,7 +28,7 @@ incoming = cluster["accumen"]["incoming"]
 
 @client.event
 async def on_ready():
-    os.system("clear")
+    os.system("cls")
     font = Figlet(font="standard")
     print(colored(font.renderText(client.user.name), "blue"))
     print(colored(f"[+] Signed in as {client.user} (ID: {client.user.id})", "blue"))
@@ -40,8 +40,17 @@ async def on_ready():
             "light_blue",
         )
     )
-    for filename in os.listdir("/cogs"):
+        # Define the base directory where your project resides
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Construct the path to the "cogs" directory relative to the base directory
+    cogs_dir = os.path.join(base_dir, "Accumen", "cogs")  # Assuming "cogs" is within "Accumen" subdirectory
+
+    print(cogs_dir)
+    for filename in cogs_dir:
+        print(filename)
         if filename.endswith(".py"):
+            
             try:
                 await client.load_extension(f"cogs.{filename[:-3]}")
                 print(colored(f"[+] {filename}", "light_green"))
@@ -70,7 +79,7 @@ async def on_ready():
     await client.tree.sync(guild=discord.Object(GUILDID))
     await client.tree.sync()
     while True:
-      await asyncio.sleep(300)
+      await asyncio.sleep(1000)
       current_server_count=len(client.guilds)
       change=current_server_count-last_server_count
       last_server_count=current_server_count
