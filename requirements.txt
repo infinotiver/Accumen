@@ -11,3 +11,4 @@ Requests==2.31.0
 sympy==1.8
 simpcalci==0.0.2
 DiscordLevelingCard==0.6.0
+python-dotenv
