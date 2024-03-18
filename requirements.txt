@@ -1,7 +1,6 @@
 discord.py
 motor==3.3.2
 nest_asyncio==1.5.1
-psutil==5.8.0
 pyfiglet==0.8.post1
 termcolor==2.4.0
 utils==1.0.2
@@ -12,3 +11,4 @@ sympy==1.8
 simpcalci==0.0.2
 DiscordLevelingCard==0.6.0
 python-dotenv
+psutil
