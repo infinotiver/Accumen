@@ -7,7 +7,7 @@ import os
 import utils.functions as funcs
 from utils.functions import dembed
 import utils.academia as acutils
-
+import utils.automod as automod
 class Academia(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -35,5 +35,23 @@ class Academia(commands.Cog):
     async def delete_data(self):
      #self.data={}
      pass
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        server=message.guild
+        if server.id !=976878887004962917:
+           return
+        if message.author.bot: # if True
+          return # skip messages from bots
+        channel = self.bot.get_channel(message.channel.id)
+        moderation=automod.text_moderation(message.content)
+        print(moderation)
+        print(channel)
+        if moderation:
+           await message.delete()
+           embed=dembed(title="Message Blocked",description=moderation[1])
+           await channel.send_message(embed=embed)
+
+        
 async def setup(bot):
     await bot.add_cog(Academia(bot))
