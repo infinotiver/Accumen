@@ -19,7 +19,7 @@ class Academia(commands.Cog):
         guild_ids=[976878887004962917],
       
     )
-    @group.command(name="pseudonymous-message", description="Send message pseudonymously")
+    @group.command(name="pseudo", description="Send message pseudonymously")
     async def pseudonymous(self,ctx,message:str):
       if ctx.user.id in self.data:
         id=self.data[ctx.user.id]
