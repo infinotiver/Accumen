@@ -93,4 +93,3 @@ async def on_ready():
 
 keep_alive()
 client.run(os.environ.get("token"), reconnect=True)
-
