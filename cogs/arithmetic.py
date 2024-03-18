@@ -99,7 +99,7 @@ class Numbers(commands.Cog):
         await ctx.response.send_message(
             file=file,
             embed=funcs.dembed(
-                title="Wolfram",
+                title="Wolfram Alpha",
                 description=f"This result is taken from Wolfram Alpha\nQuery: `{query}`",
             ),
         )
