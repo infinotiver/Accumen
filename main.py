@@ -20,6 +20,7 @@ import asyncio
 import datetime
 import time
 from dotenv import load_dotenv
+
 os.chdir("..")
 load_dotenv()
 intents = discord.Intents.all()
@@ -75,12 +76,11 @@ async def on_ready():
     client.add_view(ubuttons.answercontrol())
     client.add_view(ubuttons.Qrscontrol())
     print(colored("[+] Persistent views and Dynamic items ", "light_blue"))
-    GUILDID =976878887004962917 
-
-    await client.tree.sync(guild=discord.Object(GUILDID))
+    dev_guild =976878887004962917 
+    await client.tree.sync(guild=discord.Object(dev_guild))
     await client.tree.sync()
     while True:
-      await asyncio.sleep(1000)
+      await asyncio.sleep(1000)  # update the embed
       current_server_count=len(client.guilds)
       change=current_server_count-last_server_count
       last_server_count=current_server_count
@@ -94,4 +94,3 @@ async def on_ready():
 keep_alive()
 client.run(os.environ.get("token"), reconnect=True)
 
-# Trying something
