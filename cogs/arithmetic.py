@@ -100,7 +100,6 @@ class Numbers(commands.Cog):
             file=file,
             embed=funcs.dembed(
                 title="Wolfram",
-                image="attachment://output.png",
                 description=f"This result is taken from Wolfram Alpha\nQuery: `{query}`",
             ),
         )
