@@ -4,6 +4,8 @@ Welcome to Accumen, your intelligent companion for Discord! Elevate your server 
 With Accumen, you can get quick and accurate answers to all your academic queries. From math problems to grammar rules, Accumen has got you covered. And with personalized learning suggestions and study tips, you'll never miss a beat in your academic journey. Invite Accumen today and experience the power of knowledge at your fingertips!
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Cunia&weight=300&pause=1000&center=true&vCenter=true&random=false&width=500&lines=Welcome+to+Accumen;Elevate+your+Discord+server+experience+;Designed+to+enhance+learning+%26+engagement.)](https://git.io/typing-svg)
+
+
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/infinotiver/Accumen)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/infinotiver/Accumen)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
