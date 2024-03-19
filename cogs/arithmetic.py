@@ -79,7 +79,7 @@ class Numbers(commands.Cog):
         description="Interesting facts about numbers",
     )
 
-    @group.command(name="wolfram", description="Query Wolfram Alpha")
+    @group.command(name="wolfram", description="Query Wolfram Alpha for mathematical expressions.")
     @app_commands.describe(query="The query string to send to Wolfram Alpha")
     async def wolf(self, ctx, query: str):
         wolfid = os.environ["wolf"]
@@ -105,14 +105,14 @@ class Numbers(commands.Cog):
         )
 
     @group.command(
-        name="calculate", description="Calculate using interactive calculator"
+        name="calculate", description="Access an interactive calculator to perform calculations."
     )
     async def interactive_calc(self, ctx):
         view = calc.InteractiveView()
         await ctx.response.send_message("```\n```", view=view)
 
     @facts.command(
-        name="number-fact", description="Tells about a fact regarding number given"
+        name="number-fact", description="Get interesting facts about a specific number."
     )
     @app_commands.describe(number="The number to get a fact about")
     async def mathfact(self, ctx, number: int):
@@ -143,7 +143,7 @@ class Numbers(commands.Cog):
         )
 
     @facts.command(
-        name="year-fact", description="Tells about a fact regarding the year given"
+        name="year-fact", description="Get interesting facts about a specific year."
     )
     @app_commands.describe(year="The year to get a fact about")
     async def yearfact(self, ctx, year: int):
@@ -169,7 +169,7 @@ class Numbers(commands.Cog):
             embed=dembed(title=d["number"], description=d["text"], footer=date)
         )
 
-    @facts.command(name="maths-trivia", description="Trivia about an integer")
+    @facts.command(name="maths-trivia", description="Get trivia facts about random integers.")
     async def triviafact(self, ctx):
         url = "https://numbersapi.p.rapidapi.com/random/trivia"
         querystring = {
@@ -199,7 +199,7 @@ class Numbers(commands.Cog):
             embed=dembed(title=d["number"], description=d["text"])
         )
 
-    @group.command(name="simple-functions", description="Many mathematical functions")
+    @group.command(name="simple-functions", description="Perform various mathematical functions s")
     @app_commands.choices(
         func=[
             app_commands.Choice(name=name, value=value)
@@ -234,7 +234,7 @@ class Numbers(commands.Cog):
                 return
         await ctx.response.send_message(embed=dembed(description=text))
 
-    @group.command(name="factorial", description="Factorial of a number")
+    @group.command(name="factorial", description="Calculate the factorial of a given number.")
     @app_commands.describe(number="The number to calculate the factorial for")
     async def prime_factors(self, ctx, number: int):
         if number < 0:
@@ -267,7 +267,7 @@ class Numbers(commands.Cog):
 
     @group.command(
         name="roman-numerals",
-        description="Convert hindu-arabic numerals to roman numerals or vice-versa",
+        description="Convert between Hindu-Arabic numerals and Roman numerals.",
     )
     @app_commands.choices(
         mode=[
