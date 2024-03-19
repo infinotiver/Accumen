@@ -11,3 +11,4 @@ sympy==1.8
 simpcalci==0.0.2
 python-dotenv
 psutil
+google-search==1.1.1
