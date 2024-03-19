@@ -31,6 +31,7 @@ class Academia(commands.Cog):
       embed.set_author(name=id)
       await channel.send(embed=embed)
       await ctx.response.send_message("Message sent",ephemeral=True)
+
     @tasks.loop(seconds = 300) 
     async def delete_data(self):
      #self.data={}
@@ -50,7 +51,19 @@ class Academia(commands.Cog):
 
         if moderation[0]:  # Check if the first value of the tuple is True
             await message.delete()
-            embed = dembed(title="Message Blocked", description=moderation[1])
+
+            # Create an embed with detailed information about the moderation action
+            embed = discord.Embed(title="Message Blocked", description="This message has been automatically blocked due to the following reasons:", color=discord.Color.red())
+
+            # Add fields to the embed to provide more information
+            embed.add_field(name="Reason", value=moderation[1], inline=False)
+            embed.add_field(name="Author", value=message.author.mention, inline=True)
+            embed.add_field(name="Channel", value=channel.mention, inline=True)
+            embed.add_field(name="Content", value=message.content, inline=False)
+            embed.add_field(name="Moderation Scores", value="\n".join([f"{category.capitalize()}: {score:.4f}" for category, score in moderation[2].items()]), inline=False)
+
+            embed.set_footer(text="This message has been automatically moderated.")
+
             await channel.send(embed=embed)
 
         
