@@ -39,9 +39,16 @@ class Academia(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         server=message.guild
+        print(server)
+        if not server:
+          return 
         if server.id !=976878887004962917:
            return
-        if message.author.bot: # if True
+        if len(message.content)<5:
+          return # Don't check for msgs having length less than 6 characters
+        if message.author.bot:
+          print(message.author) # if True
+          print(message.author.bot)
           return # skip messages from bots
         channel = self.bot.get_channel(message.channel.id)
         moderation=automod.text_moderation(message.content)
@@ -50,7 +57,7 @@ class Academia(commands.Cog):
         if moderation:
            await message.delete()
            embed=dembed(title="Message Blocked",description=moderation[1])
-           await channel.send_message(embed=embed)
+           await channel.send(embed=embed)
 
         
 async def setup(bot):
