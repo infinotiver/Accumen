@@ -10,7 +10,7 @@ from reactionmenu import ViewMenu, ViewButton
 import motor.motor_asyncio
 import nest_asyncio
 import random
-from DiscordLevelingCard import RankCard, Settings
+#from DiscordLevelingCard import RankCard, Settings
 nest_asyncio.apply()
 mongo_url = os.environ["mongodb"]
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
