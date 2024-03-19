@@ -18,11 +18,11 @@ def text_moderation(text):
       print(data)
       # Define thresholds 
       thresholds = {
-          "toxic": 0.1,
-          "indecent": 0.2,
-          "threat": 0.05,
-          "offensive": 0.1,
-          "erotic": 0.05,
+          "toxic": 0.6,
+          "indecent": 0.8,
+          "threat": 0.3,
+          "offensive": 0.8,
+          "erotic": 0.2,
           "spam": 0.7  # Higher threshold for spam to avoid false positives
       }
 
