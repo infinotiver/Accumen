@@ -9,7 +9,6 @@ With Accumen, you can get quick and accurate answers to all your academic querie
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 [![GitHub license](https://img.shields.io/github/license/infinotiver/Accumen.svg)](https://github.com/prakarsh17/tessarect-bot/blob/main/LICENSE)
 [![Issues](https://img.shields.io/github/issues/infinotiver/Accumen.svg?colorB=3333ff)](https://github.com/Gorialis/jishaku/issues)
-[![Commit activity](https://img.shields.io/github/commit-activity/w/infinotiver/Accumen.svg)](https://github.com/Gorialis/jishaku/commits)
 
 
 
