@@ -60,6 +60,8 @@ async def on_ready():
                 print(colored(f"[-] Not Loaded {filename}\n {e}", "red"))
 
     system_latency = round(client.latency * 1000)
+    ctime=datetime.datetime.now()
+    unixtime = time.mktime(ctime.timetuple())
     view=ubuttons.contro()
     em = dembed(title=f"{client.user.name} is online !")
     em.set_thumbnail(url=client.user.avatar.url)
@@ -67,6 +69,7 @@ async def on_ready():
     em.add_field(name="Servers", value=f"{len(client.guilds)}", inline=True)
     last_server_count=len(client.guilds)
     em.add_field(name="Users", value=f"{len(client.users)}", inline=True)
+    em.add_field(name="Started",value=f"<t:{int(unixtime)}:R>",inline=False)
     channel=client.get_channel(1197514010388611102)
     await channel.purge(limit=100) 
     msg=await channel.send(embed=em,view=view)
@@ -79,8 +82,9 @@ async def on_ready():
     dev_guild =976878887004962917 
     await client.tree.sync(guild=discord.Object(dev_guild))
     await client.tree.sync()
+    
     while True:
-      await asyncio.sleep(1000)  # update the embed
+      await asyncio.sleep(10000)  # update the embed
       current_server_count=len(client.guilds)
       change=current_server_count-last_server_count
       last_server_count=current_server_count
@@ -88,7 +92,6 @@ async def on_ready():
       ctime=datetime.datetime.now()
       unixtime = time.mktime(ctime.timetuple())
       em.description=f"\n last updated <t:{int(unixtime)}:R>"
-      em.set_footer(text=f"Last Updated {ctime}")
       await msg.edit(embed=em,view=view)
 
 keep_alive()
