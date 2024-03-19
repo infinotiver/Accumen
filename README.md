@@ -13,8 +13,7 @@ With Accumen, you can get quick and accurate answers to all your academic querie
 
 
 
-View glimpses at...
-https://youtu.be/azKoKSETLks
+[![Accumen Glimpses](https://res.cloudinary.com/marcomontalbano/image/upload/v1710839948/video_to_markdown/images/youtube--azKoKSETLks-c05b58ac6eb4c4700831b2b3070cd403.jpg)](https://youtu.be/azKoKSETLks "Accumen Glimpses")
 
 ## 🌐 Features
 
