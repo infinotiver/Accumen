@@ -76,12 +76,15 @@ class Levels(commands.Cog):
                   break
 
           progress_bar = f"{int((xp / (200 * ((1 / 2) * lvl))) * 20) * '<:D4:1074952383605506089>'}{(20 - int((xp / (200 * ((1 / 2) * lvl))) * 20)) * '<:D11:1128533232846131282>'}"
+          """
           card_settings = Settings(
               text_color="white",
               bar_color="#8a2be2",
               background="https://img.freepik.com/free-vector/abstract-design-background-with-blue-purple-gradient_1048-13167.jpg",
           )
+          """
           max_xp=int(200 * ((1 / 2) * lvl))
+          """
           card = RankCard(
               settings=card_settings,
               avatar=ctx.user.avatar.url,
@@ -90,7 +93,8 @@ class Levels(commands.Cog):
               max_exp=max_xp,
               username=ctx.user.display_name
           )
-          image = await card.card3()
+          """
+          #image = await card.card3()
           message = (
               f"{ctx.user.name}'s Level stats\n"
               f"Name: {ctx.user.mention}\n"
@@ -100,7 +104,10 @@ class Levels(commands.Cog):
               f"Progress Bar [lvl]: {progress_bar}\n"
           )
           embed=dembed(description=message)
-          await ctx.followup.send(embed=embed,file=discord.File(image, filename="rank.png"))
+          await ctx.followup.send(
+            embed=embed,
+            #file=discord.File(image, filename="rank.png")
+          )
     @group.command(name="leaderboard",description="Shows the leaderboard")  
     async def lb(self, ctx):
       rankings = levelling.find().sort("xp", -1)
