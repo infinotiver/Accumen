@@ -32,7 +32,7 @@ incoming = cluster["accumen"]["incoming"]
 
 @client.event
 async def on_ready():
-    os.system("cls")
+    os.system("clear")
     font = Figlet(font="standard")
     print(colored(font.renderText(client.user.name), "blue"))
     print(colored(f"[+] Signed in as {client.user} (ID: {client.user.id})", "blue"))
