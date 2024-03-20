@@ -82,17 +82,7 @@ async def on_ready():
     dev_guild =976878887004962917 
     await client.tree.sync(guild=discord.Object(dev_guild))
     await client.tree.sync()
-    
-    while True:
-      await asyncio.sleep(10000)  # update the embed
-      current_server_count=len(client.guilds)
-      change=current_server_count-last_server_count
-      last_server_count=current_server_count
-      em.set_field_at(index=1, name="Servers", value=f"{len(client.guilds)} ({change})")
-      ctime=datetime.datetime.now()
-      unixtime = time.mktime(ctime.timetuple())
-      em.description=f"\n last updated <t:{int(unixtime)}:R>"
-      await msg.edit(embed=em,view=view)
+ 
 
 keep_alive()
 client.run(os.environ.get("token"), reconnect=True)
