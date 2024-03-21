@@ -20,11 +20,13 @@ import asyncio
 import datetime
 import time
 from dotenv import load_dotenv
+from pretty_help import PrettyHelp
 
 os.chdir("..")
 load_dotenv()
+
 intents = discord.Intents.all()
-client = commands.Bot(command_prefix="a!", intents=intents,owner_id=900992402356043806)
+client = commands.Bot(command_prefix="a!", intents=intents,help_command=PrettyHelp())
 mongo_url = os.environ.get("mongodb")
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 incoming = cluster["accumen"]["incoming"]
