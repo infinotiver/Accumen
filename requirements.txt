@@ -12,3 +12,4 @@ simpcalci==0.0.2
 python-dotenv
 psutil
 google-search==1.1.1
+discord-pretty-help==2.0.7
