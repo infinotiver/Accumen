@@ -36,7 +36,25 @@ class Academia(commands.Cog):
     async def delete_data(self):
      #self.data={}
      pass
+    @group.command(name="reload",description="Reload cogs")
+    @commands.is_owner()
+    async def reload(self,ctx):
+      await ctx.response.defer()
+      # Define the base directory where your project resides
+      base_dir = os.path.dirname(os.path.abspath(__file__))
 
+      # Construct the path to the "cogs" directory relative to the base directory
+      cogs_dir = os.path.join(base_dir) 
+
+      for filename in os.listdir(cogs_dir):
+          if filename.endswith(".py"):
+              try:
+                  await self.bot.unload_extension(f"cogs.{filename[:-3]}")
+                  await self.bot.load_extension(f"cogs.{filename[:-3]}")
+      
+              except Exception as e:
+                 print(e)
+      await ctx.followup.send("Cogs Reloaded")
     @commands.Cog.listener()
     async def on_message(self, message):
         server = message.guild
@@ -48,7 +66,6 @@ class Academia(commands.Cog):
 
         channel = self.bot.get_channel(message.channel.id)
         moderation = automod.text_moderation(message.content)
-
         if moderation[0]:  # Check if the first value of the tuple is True
             await message.delete()
 
@@ -60,7 +77,6 @@ class Academia(commands.Cog):
             embed.add_field(name="Author", value=message.author.mention, inline=True)
             embed.add_field(name="Channel", value=channel.mention, inline=True)
             embed.add_field(name="Content", value=message.content, inline=False)
-            embed.add_field(name="Moderation Scores", value="\n".join([f"{category.capitalize()}: {score:.4f}" for category, score in moderation[2].items()]), inline=False)
 
             embed.set_footer(text="This message has been automatically moderated.")
 
