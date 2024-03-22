@@ -51,6 +51,7 @@ class EduAI(commands.Cog):
     async def essay(
         self, ctx, title: str,essay_type:app_commands.Choice[str]
     ):
+        return await ctx.response.send_message(embed=dembed(title="Command Unavailable",description="This command is currently under maintenance and not available for use.",preset="beta"))
         try:
             await ctx.response.defer()
             url="https://essay-writer.p.rapidapi.com/essay-writer"
