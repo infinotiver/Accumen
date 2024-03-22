@@ -111,7 +111,7 @@ class Assist(commands.Cog):
             for word in title_words:
                 if current.lower() in map(str.lower, title_words):
                     data.append(
-                        app_commands.Choice(name=query["title"], value=query["_id"])
+                        app_commands.Choice(name=query["title"], value=query["id"])
                     )
                     break
         return data
@@ -133,7 +133,7 @@ class Assist(commands.Cog):
         await ctx.response.defer(ephemeral=False)
         id = str(await queries_col.count_documents({}) + 1)
         query = {
-            "_id": id,
+            "id": id,
             "user_id": ctx.user.id,
             "category": category.value,
             "difficulty": difficulty.value,
@@ -170,7 +170,7 @@ class Assist(commands.Cog):
         data = await incoming.find().to_list(length=None)
         for x in data:
             try:
-                guild = await self.bot.fetch_guild(int(x["_id"]))
+                guild = await self.bot.fetch_guild(int(x["id"]))
                 channel = self.bot.get_channel(int(x["channel"]))
 
                 view =  assetsb.Qrscontrol()
@@ -188,11 +188,11 @@ class Assist(commands.Cog):
                     content="### New Query", embed=embed, view=view
                 )
 
-                fq = await queries_col.find_one({"_id": id})
+                fq = await queries_col.find_one({"id": id})
                 fq["messages"].append(
                     {"channel": str(channel.id), "msg": msg.id, "guild": str(guild.id)}
                 )
-                await queries_col.replace_one({"_id": id}, fq)
+                await queries_col.replace_one({"id": id}, fq)
                 view.message = msg
                 self.bot.add_view(view)
             except Exception as e:
@@ -211,7 +211,7 @@ class Assist(commands.Cog):
     @app_commands.autocomplete(query_id=query_autocompletion)
     async def answer_query(self, ctx, query_id: str, answer: str):
         await ctx.response.defer(ephemeral=False)
-        query = await queries_col.find_one({"_id": query_id})
+        query = await queries_col.find_one({"id": query_id})
         title = query.get("title")
         if not query:
             await ctx.followup.send(
@@ -244,7 +244,7 @@ class Assist(commands.Cog):
         query["answers"].append({"ans": answer, "user": user_id})
 
         # Update the query in the database
-        result = await queries_col.replace_one({"_id": query_id}, query)
+        result = await queries_col.replace_one({"id": query_id}, query)
 
         if result.modified_count == 0:
             await ctx.followup.send(
@@ -303,7 +303,7 @@ class Assist(commands.Cog):
                 custom_embed=dembed(title=menu_title),
             )
             for x in queries:
-                id = x["_id"]
+                id = x["id"]
                 title = x["title"]
                 desc = x["description"]
                 time = round(x["timestamp"])
@@ -354,7 +354,7 @@ class Assist(commands.Cog):
                 custom_embed=dembed(title=menu_title),
             )
             for x in queries:
-                id = x["_id"]
+                id = x["id"]
                 title = x["title"]
                 desc = x["description"]
                 time = round(x["timestamp"])
@@ -401,7 +401,7 @@ class Assist(commands.Cog):
                 custom_embed=dembed(title=menu_title),
             )
             for x in queries:
-                id = x["_id"]
+                id = x["id"]
                 title = x["title"]
                 desc = x["description"]
                 time = round(x["timestamp"])
@@ -452,7 +452,7 @@ class Assist(commands.Cog):
                 custom_embed=dembed(title=menu_title),
             )
             for x in queries:
-                id = x["_id"]
+                id = x["id"]
                 title = x["title"]
                 desc = x["description"]
                 time = round(x["timestamp"])
@@ -494,14 +494,14 @@ class Assist(commands.Cog):
     ):
         await ctx.response.defer()
         if not disable:
-            results = await incoming.find_one({"_id": ctx.guild.id})
+            results = await incoming.find_one({"id": ctx.guild.id})
             if not results:
-                query = {"_id": ctx.guild.id, "channel": channel.id}
+                query = {"id": ctx.guild.id, "channel": channel.id}
                 await incoming.insert_one(query)
 
             else:
                 await incoming.update_one(
-                    {"_id": ctx.guild.id}, {"$set": {"channel": channel.id}}
+                    {"id": ctx.guild.id}, {"$set": {"channel": channel.id}}
                 )
             await ctx.followup.send(
                 embed=dembed(
@@ -509,14 +509,14 @@ class Assist(commands.Cog):
                 )
             )
         elif disable:
-            results = await incoming.find_one({"_id": ctx.guild.id})
+            results = await incoming.find_one({"id": ctx.guild.id})
             if not results:
                 return await ctx.followup.send(
                     "You haven't set any incoming channel yet"
                 )
             else:
                 channel = await self.bot.get_channel(incoming.get("channel"))
-                await incoming.delete_one({"_id": ctx.guild.id})
+                await incoming.delete_one({"id": ctx.guild.id})
                 await ctx.followup.send(
                     embed=dembed(
                         description=f"Successfully unset {channel.mention} as incoming channel for receiving queries"
@@ -530,7 +530,7 @@ class Assist(commands.Cog):
     @commands.guild_only()
     async def close_query(self, ctx, query_id: str):
         await ctx.response.defer()
-        incoming_channel = await incoming.find_one({"_id": ctx.guild.id})
+        incoming_channel = await incoming.find_one({"id": ctx.guild.id})
         if (
             not incoming_channel
             or not incoming_channel.get("channel") == ctx.channel.id
@@ -542,7 +542,7 @@ class Assist(commands.Cog):
             )
             return
         # Find the query in the database
-        query = await queries_col.find_one({"_id": query_id})
+        query = await queries_col.find_one({"id": query_id})
 
         if not query:
             await ctx.followup.send(
@@ -568,7 +568,7 @@ class Assist(commands.Cog):
 
         # Close the query
         query["closed"] = True
-        await queries_col.replace_one({"_id": query_id}, query)
+        await queries_col.replace_one({"id": query_id}, query)
 
         # Inform the user that the query has been closed
         await ctx.followup.send(
