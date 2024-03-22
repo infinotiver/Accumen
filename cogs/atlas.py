@@ -66,7 +66,7 @@ class Atlas(commands.Cog):
             title="ATLAS Announcement",
             description=(
                 f"\nAllowed Places\n* Countries\n*Continent\n ~~States~~\n* ~~Cities~~\n* \nStates and Cities coming soon...\n"
-                f"{divider}\n Interested members use /game-enter command"
+                f"{divider}\n To enter the game, use `/game-enter` command"
             ),
             color=theme,
         )
@@ -82,21 +82,21 @@ class Atlas(commands.Cog):
         self.games[str(ctx.guild.id)] = game
         print(self.games)
 
-        embed.description += "\nSuccessfully initiated game"
+        embed.description += "\nSuccessfully initiated game in {ctx.channel.mention}"
         await msg.edit(embed=embed)
 
-    @atlas.command(name="game-enter", description="Enter a game of ATLAS")
+    @atlas.command(name="game-enter", description="Participate in a game of ATLAS.")
     async def enter(self, ctx):
         await ctx.response.defer()
         if str(ctx.guild.id) not in self.games:
-            return await ctx.followup.send("No game is currently running")
+            return await ctx.followup.send("No game is currently running in this server")
         elif ctx.user.id in self.games[str(ctx.guild.id)]["users"]:
             return await ctx.followup.send("You are already in the game")
         elif ctx.channel.id != self.games[str(ctx.guild.id)]["channel"]:
-            return await ctx.followup.send("This is not the game channel")
+            return await ctx.followup.send("This is not the correct game channel")
         elif len(self.games[str(ctx.guild.id)]["users"]) > 5:
             return await ctx.followup.send(
-                "Currently , more than 5 participants can not play.")
+                "Currently, more than 5 participants can not play in a single game")
         else:
             self.games[str(ctx.guild.id)]["users"].append(ctx.user.id)
             channel = await self.bot.fetch_channel(
@@ -105,28 +105,28 @@ class Atlas(commands.Cog):
             msg = await channel.fetch_message(self.games[str(ctx.guild.id)]["message"])
             print(msg.embeds[0])
             embed = msg.embeds[0]
-            embed.description += f"\n{ctx.user.mention} has joined the game"
+            embed.description += f"\n{ctx.user.mention} has joined the game."
             await msg.edit(embed=embed)
-            await ctx.followup.send("You have entered the game")
+            await ctx.followup.send("You have successfully entered the game")
 
     @atlas.command(name="game-start", description="Start a game of ATLAS")
     async def start(self, ctx):
         await ctx.response.defer()
         if str(ctx.guild.id) not in self.games:
             return await ctx.followup.send(
-                embed=dembed(description="No game is currently running")
+                embed=dembed(description="No game is currently running in this server")
             )
         elif ctx.channel.id != self.games[str(ctx.guild.id)]["channel"]:
             return await ctx.followup.send(
-                embed=dembed(description="This is not the game channel")
+                embed=dembed(description="This is not the correct game channel")
             )
-        elif len(self.games[str(ctx.guild.id)]["users"]) < 2:
+        elif len(self.games[str(ctx.guild.id)]["users"]) < 1:
             return await ctx.followup.send(
-                embed=dembed(description="Insufficient members for game")
+                embed=dembed(description="Insufficient members for game (At least 2 members required)")
             )
         elif self.games[str(ctx.guild.id)]["time"]["started"] != 0:
             return await ctx.followup.send(
-              embed=dembed(description="Game has already started",ephemeral=True)
+              embed=dembed(description="Game has already been started by someone",ephemeral=True)
             )
         else:
       
