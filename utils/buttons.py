@@ -36,7 +36,7 @@ class contro(discord.ui.View):
         embed.add_field(name="Servers", value=f"{len(interaction.client.guilds)}", inline=True)
         await interaction.response.send_message(embed=embed,ephemeral=True)
 
-class answercontrol(discord.ui.View):
+class answer_control_view(discord.ui.View):
   
   def __init__(self):
     super().__init__(timeout=None)
