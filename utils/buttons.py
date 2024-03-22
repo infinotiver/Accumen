@@ -136,12 +136,13 @@ class Qrscontrol(discord.ui.View):
       description=query["description"]
       difficulty=query["difficulty"]
       user=query["user_id"]
-      upvotes=query["votes"]
+      upvote_count=query["votes"]
       category=query["category"]
       embed = discord.Embed(title=f"**{title}**",description=description, color=funcs.theme)
-      authr = f"{user} ∙ {difficulty}"
+      author_string = f"{user} ∙ {difficulty}"
+      embed.set_footer(text=author_string)
       embed.set_author(name=interaction.user, icon_url=interaction.user.avatar.url)
-      embed.add_field(name="Upvotes", value=upvotes)
+      embed.add_field(name="Upvote", value=upvote_count)
       embed.add_field(name="Category", value=f"`{category}`")
       await interaction.client.get_channel(979345665081610271).send(f" {interaction.user.mention} Reported the following query",embed=embed)
       await interaction.response.send_message("Sent the report to the bot moderators")
