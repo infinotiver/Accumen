@@ -87,8 +87,9 @@ class EduAI(commands.Cog):
             await menu.start()
         except Exception as e:
             await ctx.followup.send(f"{e}\nAn error occurred while processing your request.\nThe hard limit of 8 requests per month is applied by the API")
+
     # Highly fatal , random generations
-    @group.command(name="chat", description="Talk to ai")
+    @group.command(name="chat", description="[EXPERIMENTAL] [BETA] Talk to A.I. chatbot")
     async def chat(self, ctx, text: str):
         await ctx.response.defer(ephemeral=True)
         url = "https://ai-chatbot.p.rapidapi.com/chat/free"
