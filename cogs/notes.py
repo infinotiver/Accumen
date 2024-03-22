@@ -11,7 +11,7 @@ from utils.functions import dembed, theme, divider
 
 mongo_url = os.environ["mongodb"]
 cluster = MongoClient(mongo_url)
-notedb = cluster["accumen"]["note"]
+notes_mongodb = cluster["accumen"]["note"]
 
 categories = {
     "Important": "important",
@@ -33,12 +33,12 @@ class SelfNotes(commands.Cog):
         embed = dembed(title=title, description=description)
         await ctx.followup.send(embed=embed)
 
-    notes = app_commands.Group(name="notes", description="blah")
+    notes = app_commands.Group(name="notes", description="Store your most important stuff and (maybe) secrets")
 
     @notes.command(name="view", description="Shows your saved notes")
     async def view(self, ctx):
         await ctx.response.defer(ephemeral=True)
-        notes_cursor = await notedb.find({"id": ctx.author.id}).to_list(None)
+        notes_cursor = await notes_mongodb.find({"id": ctx.author.id}).to_list(None)
         notes = []
         async for note in notes_cursor:
             notes.append(note)
@@ -54,7 +54,7 @@ class SelfNotes(commands.Cog):
             message = note["note"]
             embed.add_field(name=category, value=message, inline=False)
 
-        await ctx.followup.send(embed=embed, ephmeral=True)
+        await ctx.followup.send(embed=embed, ephemeral=True)
 
     @notes.command(name="add", description="Adds a note to the selected category")
     @app_commands.choices(
@@ -68,7 +68,7 @@ class SelfNotes(commands.Cog):
         category = category.value
 
         new_note = {"id": ctx.user.id, "category": category, "note": message}
-        notedb.insert_one(new_note)
+        notes_mongodb.insert_one(new_note)
 
         await ctx.followup.send(
             embed=dembed(title="New Note", description="Your note has been stored.")
@@ -77,14 +77,14 @@ class SelfNotes(commands.Cog):
     @notes.command(name="delete", description="Deletes a note")
     async def delete(self, ctx, note_id: int):
         await ctx.response.defer(ephemeral=True)
-        notes_cursor = await notedb.find({"id": ctx.author.id})
+        notes_cursor = await notes_mongodb.find({"id": ctx.author.id})
         notes = await notes_cursor.to_list(length=None)
         if 0 < note_id <= len(notes):
             note = notes[note_id - 1]
             category = note["category"]
             message = note["note"]
 
-            await notedb.delete_one(note)
+            await notes_mongodb.delete_one(note)
 
             await ctx.followup.send(
                 embed=dembed(
