@@ -27,9 +27,10 @@ async def fetch_data(place=None):
         all_locations.append("Europe")
         all_locations.append("North America")
         all_locations.append("South America")
-        all_locations.append("Oceania")
-        all_locations.append("Antarctica")
         all_locations.append("Australia")
+        all_locations.append("Oceania") #  [Todo] Consider Merging Australia and Oceania 
+        all_locations.append("Antarctica")
+
         if not place:
             return all_locations
         else:
