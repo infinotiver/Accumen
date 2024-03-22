@@ -1,13 +1,3 @@
-def changelog():
-    text = """
-
-  Changelog ( With accordance to editor activity for personal use only)
-  25-12-2023 - 26-12-2023
-  - commited on 26-12
-  """
-    return text
-
-
 import os
 import asyncio
 import discord
