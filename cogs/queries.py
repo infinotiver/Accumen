@@ -149,8 +149,8 @@ class Assist(commands.Cog):
         # Insert the query into the queries collection
         await queries_col.insert_one(query)
         embed = discord.Embed(title=f"**{title}**", color=theme)
-        authr = f"{str(ctx.user.name)} [{str(ctx.user.id)}] ∙ {difficulty.name}"
-        embed.set_author(name=authr, icon_url=ctx.user.avatar.url)
+        author_string = f"{str(ctx.user.name)} [{str(ctx.user.id)}] ∙ {difficulty.name}"
+        embed.set_author(name=author_string, icon_url=ctx.user.avatar.url)
         embed.add_field(name="Upvote", value="0")
         embed.add_field(name="Category", value=f"`{category.name}`")
         embed.add_field(name="Reward", value="20 XP")
@@ -166,7 +166,7 @@ class Assist(commands.Cog):
             color=funcs.secondary_theme,
         )
         sent_embed.add_field(name="Query", value=title, inline=False)
-        omsg = await ctx.followup.send(embed=sent_embed)
+        original_message = await ctx.followup.send(embed=sent_embed)
         data = await incoming.find().to_list(length=None)
         for x in data:
             try:
@@ -197,15 +197,15 @@ class Assist(commands.Cog):
                 self.bot.add_view(view)
             except Exception as e:
                 print(e)
-        oview = discord.ui.View(timeout=None)
-        oview.add_item(
+        successfully_posted = discord.ui.View(timeout=None)
+        successfully_posted.add_item(
             discord.ui.Button(
                 label="Successfully Posted",
                 style=discord.ButtonStyle.primary,
                 disabled=True,
             )
         )
-        await omsg.edit(embed=sent_embed, view=oview)
+        await original_message.edit(embed=sent_embed, view=successfully_posted)
 
     @group.command(name="answer", description="Answer someone's query")
     @app_commands.autocomplete(query_id=query_autocompletion)
