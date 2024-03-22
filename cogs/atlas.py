@@ -220,11 +220,11 @@ class Atlas(commands.Cog):
             game_embed.add_field(
                 name="Start Time", value=f"<t:{started}:F>", inline=False
             )
-            game_embed.add_field(name="End Time", value=f"<t:{ended}:R>", inline=False)
+            game_embed.add_field(name="End Time", value=f"<t:{ended}:F>", inline=False)
             await ctx.followup.send(embed=game_embed)
             del self.games[str(ctx.guild.id)]
             await ctx.followup.send(
-                embed=dembed(description=f"Game Ended. The winner is {winner.mention}")
+                embed=dembed(description=f"The Game has ended. The winner is {winner.mention}")
             )
 
 
