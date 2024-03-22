@@ -1,0 +1,144 @@
+import discord
+from discord.ext import commands
+from pymongo import MongoClient
+import os
+import motor.motor_asyncio
+import nest_asyncio
+from discord import app_commands
+# Database connection (replace with your credentials)
+mongo_url = os.environ["mongodb"]
+cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
+db = cluster["accumen"]
+resources_collection = db["resources"]
+
+class Resource(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        self.reviewers = [900992402356043806]  # List of reviewer user IDs
+        self.required_approvals = 1  # Number of approvals needed for posting
+    group = app_commands.Group(
+        name="resources",
+        description="Academia only commands",
+        guild_ids=[976878887004962917],
+      
+    )
+    @group.command(name="submit")
+    async def submit(self, ctx, resource_type: str, name: str,attachment:discord.Attachment=None, *, description: str):
+        """Submits a resource for review and potential posting in the forum channel."""
+        # Extract file (optional)
+
+        attachment_url = attachment.url
+
+        # Basic validation
+        if len(name) < 3:
+            await ctx.response.send_message("**Resource name must be at least 3 characters long.**")
+            return
+        if len(description) < 10:
+            await ctx.response.send_message("**Resource description must be at least 10 characters long.**")
+            return
+
+        # Store resource details in database
+        new_resource = {
+            "type": resource_type,
+            "name": name,
+            "description": description,
+            "author": ctx.user.id,
+            "submitted_by": ctx.user.mention,
+            "url": attachment_url,
+            "status": "Submitted",
+            "reviewers": self.reviewers,
+            "votes": {"approve": 0, "reject": 0},
+        }
+        resources_collection.insert_one(new_resource)
+
+        # Send confirmation message
+        await ctx.response.send_message(f"**Thank you, {ctx.user.mention}! Your resource '{name}' has been submitted for review.**")
+
+        # Notify reviewers (optional)
+        for reviewer_id in self.reviewers:
+            reviewer = self.bot.get_user(reviewer_id)
+            if reviewer:
+                await reviewer.send(f"**A new resource '{name}' needs review! (Channel: {ctx.channel.mention})**")
+
+    @group.command(name="review")
+    @commands.has_permissions(manage_messages=True)
+    async def review(self, ctx, name: str, action: str):
+        """Reviews a submitted resource (approve/reject)."""
+        # Check if resource exists and user has permissions
+        resource = resources_collection.find_one({"name": name})
+        if not resource or not ctx.user.guild_permissions.manage_messages:
+            await ctx.response.send_message("**You cannot review resources.**")
+            return
+
+        # Validate action
+        if action.lower() not in ["approve", "reject"]:
+            await ctx.response.send_message("**Invalid action. Please use 'approve' or 'reject'.**")
+            return
+
+        # Update resource status and votes
+        resource["votes"][action.lower()] += 1
+        resources_collection.update_one({"_id": resource["_id"]}, {"$set": resource})
+
+        # Check for required approvals and post to forum
+        if resource["votes"]["approve"] >= self.required_approvals:
+            await self.post_to_forum(resource)
+            resources_collection.delete_one({"_id": resource["_id"]})
+        elif resource["votes"]["reject"] > 0:
+            resources_collection.delete_one({"_id": resource["_id"]})
+
+        # Notify author
+        author = self.bot.get_user(resource["author"])
+        if author:
+            await author.send(
+                f"**Your resource '{name}' has been {action.upper()}d!**\n(Current votes: Approve: {resource['votes']['approve']}, Reject: {resource['votes']['reject']})"
+            )
+
+        # Send confirmation message to reviewer
+        await ctx.response.send_message(f"**Resource '{name}' has been voted {action.upper()}d.**")
+    @group.command(name="search")
+    async def search(self, ctx, query: str, page: int = 1):
+        """Searches for submitted resources based on keywords or filters."""
+        # Define search filters (can be extended for additional criteria)
+        filters = {"$text": {"$search": query}}
+
+        # Pagination logic (adjust page size as needed)
+        page_size = 10
+        skip = (page - 1) * page_size
+        sort = {"_id": -1}  # Sort by newest first
+
+        # Search resources in database
+        resource_cursor = resources_collection.find(filters, projection={"score": {"$meta": "textScore"}}, sort=sort).skip(skip).limit(page_size)
+        resources = list(resource_cursor)
+
+        # Check if any resources found
+        if not resources:
+            await ctx.response.send_message(f"**No resources found matching '{query}'.**")
+            return
+
+        # Build embed message with search results
+        embed = discord.Embed(title="Search Results")
+        for i, resource in enumerate(resources, start=skip + 1):
+            score = resource.get("score", 0)  # Extract search score (optional)
+            embed.add_field(
+                name=f"{i}. {resource['name']}",
+                value=f"{resource['description'][:100]} ({score:.2f})",  # Truncate description and show search score (optional)
+                inline=False,
+            )
+
+        # Add pagination buttons (if needed)
+        total_resources = resources_collection.count_documents(filters)
+        total_pages = (total_resources + page_size - 1) // page_size
+        if total_pages > 1:
+            buttons = [
+                ("◀️", lambda _: self.search(ctx, query, page - 1) if page > 1 else None),
+                ("▶️", lambda _: self.search(ctx, query, page + 1) if page < total_pages else None),
+            ]
+            for label, callback in buttons:
+                embed.set_footer(text=f"Page {page} of {total_pages}")
+                await ctx.response.send_message(embed=embed, view=discord.View(children=[discord.Button(style=discord.ButtonStyle.gray, label=label, callback=callback)]))
+        else:
+            await ctx.response.send_message(embed=embed)
+  # ... (other commands and functionality)
+
+async def setup(bot):
+    await bot.add_cog(Resource(bot))
