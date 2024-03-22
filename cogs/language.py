@@ -27,7 +27,7 @@ class Language(commands.Cog):
         name="language", description="Execute language-related commands."
     )
 
-    @group.command(name="grammar")
+    @group.command(name="grammar",description="Lists out grammatical improvements for a sentence")
     @app_commands.choices(language=language_choices)
     @app_commands.describe(query_text="The message to check for grammar errors.")
     async def grammar(
@@ -66,45 +66,56 @@ class Language(commands.Cog):
                 length = match["context"]["length"]
                 error_context = query_text[offset : offset + length]
                 text = f"""
-            ## {message}
-            ### **Description** : {description}
-            **Context**: ```css\n.{error_context}\n```
-            **Replacements**: {replacement}
-            **Error Rule**: {error_rule}
-            **Error Rule Description**: {error_rule_description}
-            **Error Category**: {error_category}"""
+                    ## {message}
+                    ### **Description** : {description}
+                    **Context**: ```css\n.{error_context}\n```
+                    **Replacements**: {replacement}
+                    **Error Rule**: {error_rule}
+                    **Error Rule Description**: {error_rule_description}
+                    **Error Category**: {error_category}
+                        """
                 menu.add_row(text)
 
             main_embed = dembed(
                 title="Grammatical Improvements",
-                description=f" for {query_text}\n Please note that I may provide incorrect results as well.",
+                description=f" for {query_text}\n{self.bot.name} can provide incorrect results also, consider checking the errors from a trusted source.",
             )
             menu.set_main_pages(main_embed)
 
             back_button = ViewButton(
-                style=discord.ButtonStyle.primary,
+                style=discord.ButtonStyle.secondary,
                 label="Back",
+                emoji="◀",
                 custom_id=ViewButton.ID_PREVIOUS_PAGE,
             )
             menu.add_button(back_button)
 
             next_button = ViewButton(
-                style=discord.ButtonStyle.secondary,
+                style=discord.ButtonStyle.primary,
                 label="Next",
+                emoji="▶",
                 custom_id=ViewButton.ID_NEXT_PAGE,
             )
             menu.add_button(next_button)
 
+            stop_button =ViewButton(
+                style=discord.ButtonStyle.danger,
+                label="Stop",
+                emoji="🛑",
+                custom_id=ViewButton.ID_END_SESSION
+            )
+            menu.add_button(stop_button)
             await menu.start()
 
         except:
             await ctx.followup.send(
                 embed=dembed(
-                    description="The word does not exist. Please check the spelling and try again."
+                    title="You are good to go",
+                    description="There are no grammatical improvements for that sentence."
                 )
             )
 
-    @group.command(name="define")
+    @group.command(name="define",description="Get definition of a word along with other useful information")
     @app_commands.describe(text="The word to define.")
     async def dictionary(self, ctx, text: str):
         await ctx.response.defer()
@@ -112,7 +123,7 @@ class Language(commands.Cog):
             url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{urllib.parse.quote_plus(text)}"
             response = requests.get(url)
             d = json.loads(response.content)
-            embed = dembed(description=f"## {text}")
+            embed = dembed(title=f"## {text}")
             phonetics = []
             for phonetic in d[0]["phonetics"]:
                 try:
