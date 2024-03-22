@@ -291,7 +291,7 @@ class Assist(commands.Cog):
         if not category and not difficulty:
             await ctx.response.defer()
             queries = await get_filtered_queries(status=status.value)
-            menu_title = "All Queries on Accumen"
+            menu_title = f"All Queries on {self.bot.name}"
             if category:
                 menu_title = f"Queries in {category.value}"
             elif difficulty:
