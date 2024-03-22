@@ -49,9 +49,9 @@ class answercontrol(discord.ui.View):
   )
   async def close(self,interaction:discord.Interaction,button:discord.ui.Button):
     query_id=self.message.embeds[0].description.split("\n")[3]
-    query = await queries_col.find_one({"_id": query_id})
+    query = await queries_col.find_one({"id": query_id})
     query["closed"] = True
-    await queries_col.replace_one({"_id": query_id}, query)
+    await queries_col.replace_one({"id": query_id}, query)
     await interaction.response.send_message(
       "Query Closed",ephemeral=True
     )
@@ -86,7 +86,7 @@ class Qrscontrol(discord.ui.View):
   async def vote(self, interaction: discord.Interaction,
                  button: discord.ui.Button):
     query_id = self.message.embeds[0].description.split("\n")[0].split("**")[1]
-    query = await queries_col.find_one({"_id": query_id})
+    query = await queries_col.find_one({"id": query_id})
     voted_users = query.get("voted_users", [])
 
     if interaction.user.id in voted_users:
@@ -98,7 +98,7 @@ class Qrscontrol(discord.ui.View):
       voted_users.append(interaction.user.id)
       await interaction.response.send_message(embed=funcs.dembed(description="Added vote"), ephemeral=True)
 
-    await queries_col.replace_one({"_id": query_id}, query)
+    await queries_col.replace_one({"id": query_id}, query)
 
     for data in query.get("messages", []):
       try:
@@ -131,7 +131,7 @@ class Qrscontrol(discord.ui.View):
                    button: discord.ui.Button):
       msg_id=interaction.message.id
       query = await queries_col.find_one({"messages": {"$elemMatch": {"msg": msg_id}}})
-      query_id=query["_id"]
+      query_id=query["id"]
       title=query["title"]
       description=query["description"]
       difficulty=query["difficulty"]
