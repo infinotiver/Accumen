@@ -1,4 +1,4 @@
-from typing import Optional
+# [Imports] Importing required modules/libraries
 import os
 import discord
 from discord import app_commands
@@ -6,8 +6,6 @@ from discord.ext import commands
 import utils.functions as funcs
 from termcolor import colored
 from pyfiglet import Figlet
-import urllib, re
-import wikipedia
 import psutil
 import utils.functions as funcs
 from utils.functions import dembed, theme, divider
@@ -15,22 +13,26 @@ from keeplive import keep_alive
 import utils.buttons as ubuttons
 import motor.motor_asyncio
 import nest_asyncio
-import typing
 import asyncio
 import datetime
 import time
 from dotenv import load_dotenv
 from pretty_help import PrettyHelp
 
+# [Setup] Loading environment variables
 os.chdir("..")
 load_dotenv()
 
+# [Setup] Discord Bot Client Setup
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="a!", intents=intents,help_command=PrettyHelp())
+
+# [Setup] MongoDB
 mongo_url = os.environ.get("mongodb")
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 incoming = cluster["accumen"]["incoming"]
 
+#[Main]
 
 @client.event
 async def on_ready():
@@ -50,7 +52,7 @@ async def on_ready():
     base_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Construct the path to the "cogs" directory relative to the base directory
-    cogs_dir = os.path.join(base_dir,  "cogs")  # Assuming "cogs" is within "Accumen" subdirectory
+    cogs_dir = os.path.join(base_dir,  "cogs")  
     
     print(cogs_dir)
     for filename in os.listdir(cogs_dir):
@@ -86,5 +88,6 @@ async def on_ready():
     await client.tree.sync()
  
 
+# [Setup] Running discord bot along with flask app
 keep_alive()
 client.run(os.environ.get("token"), reconnect=True)
