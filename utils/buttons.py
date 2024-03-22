@@ -21,7 +21,7 @@ class contro(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.button(
-        label="Stats",
+        label="Dev Stats",
         style=discord.ButtonStyle.grey,
         custom_id="stats",
         emoji="📰",
@@ -30,7 +30,7 @@ class contro(discord.ui.View):
         results = await system.find_one({"_id": "commands_usage"})
         count=str(results["count"])
         system_latency = round(interaction.client.latency * 1000)
-        embed=funcs.dembed(title="Stats",description=f"**Command Used:** {count}\n**Total Queries:** "+str(await queries_col.count_documents({})))
+        embed=funcs.dembed(title="Stats",description=f"**TotalCommand Used:** {count}\n**Total Queries:** "+str(await queries_col.count_documents({})))
         embed.set_thumbnail(url=interaction.client.user.avatar.url)
         embed.add_field(name="Ping", value=f"{system_latency} ms", inline=False)
         embed.add_field(name="Servers", value=f"{len(interaction.client.guilds)}", inline=True)
