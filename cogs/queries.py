@@ -282,7 +282,7 @@ class Assist(commands.Cog):
         *,
         category: app_commands.Choice[str] = None,
         difficulty: app_commands.Choice[str] = None,
-        status: app_commands.Choice[str] = None,
+        status: app_commands.Choice[str] = True,
     ):
         if status.value == "False":
             status.value = False
