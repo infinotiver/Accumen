@@ -151,7 +151,7 @@ class Assist(commands.Cog):
         embed = discord.Embed(title=f"**{title}**", color=theme)
         authr = f"{str(ctx.user.name)} [{str(ctx.user.id)}] ∙ {difficulty.name}"
         embed.set_author(name=authr, icon_url=ctx.user.avatar.url)
-        embed.add_field(name="Upvotes", value="0")
+        embed.add_field(name="Upvote", value="0")
         embed.add_field(name="Category", value=f"`{category.name}`")
         embed.add_field(name="Reward", value="20 XP")
         timestamp = format_dt(ctx.created_at, "R")
@@ -200,7 +200,7 @@ class Assist(commands.Cog):
         oview = discord.ui.View(timeout=None)
         oview.add_item(
             discord.ui.Button(
-                label="Successfuly Posted",
+                label="Successfully Posted",
                 style=discord.ButtonStyle.primary,
                 disabled=True,
             )
@@ -486,7 +486,7 @@ class Assist(commands.Cog):
             await menu.start()
 
     @group.command(
-        name="channel", description="Set channel where you recieve all the queries"
+        name="channel", description="Set channel where you receive all the queries"
     )
     @commands.has_permissions(manage_messages=True)
     async def incomingset(
@@ -505,7 +505,7 @@ class Assist(commands.Cog):
                 )
             await ctx.followup.send(
                 embed=dembed(
-                    description=f"Successfuly Set Incoming  Channel for receiving queries \t {channel.mention}"
+                    description=f"Successfully Set Incoming  Channel for receiving queries \t {channel.mention}"
                 )
             )
         elif disable:
@@ -519,7 +519,7 @@ class Assist(commands.Cog):
                 await incoming.delete_one({"_id": ctx.guild.id})
                 await ctx.followup.send(
                     embed=dembed(
-                        description=f"Successfuly unset {channel.mention} as incoming channel for receiving queries"
+                        description=f"Successfully unset {channel.mention} as incoming channel for receiving queries"
                     )
                 )
 
@@ -537,7 +537,7 @@ class Assist(commands.Cog):
         ):
             await ctx.followup.send(
                 embed=dembed(
-                    description="Invalid Channel\n Please use the choosen query channel or set one..."
+                    description="Invalid Channel\n Please use the chosen query channel or set one..."
                 )
             )
             return
