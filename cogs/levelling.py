@@ -21,7 +21,7 @@ class Levels(commands.Cog):
         self.bot = bot
 
     group = app_commands.Group(
-        name="levels", description="Execute level-related commands."
+        name="level", description="Execute leveling commands"
     )
     async def add_xp(self, user_id, xp_amount):
       stats = await levelling.find_one({"id": user_id})
@@ -108,22 +108,28 @@ class Levels(commands.Cog):
             embed=embed,
             #file=discord.File(image, filename="rank.png")
           )
-    @group.command(name="leaderboard",description="Shows the leaderboard")  
+    @group.command(name="leaderboard",description="Shows the global leaderboard")  
     async def lb(self, ctx):
       rankings = levelling.find().sort("xp", -1)
       i = 1
       embed = dembed(
-          title="Rankings",
-          color=theme
+          title="Global Leaderboard",
+      )
+      menu = ViewMenu(
+        ctx,
+        menu_type=ViewMenu.TypeEmbedDynamic,
+        rows_requested=5,
+        delete_interactions=True,
+        delete_items_on_timeout=True,
+        timeout=10
       )
       async for x in rankings:
           try:
-              temp = ctx.guild.get_member(x["id"])
-              tempxp = x["xp"]
-              embed.add_field(
-                  name=f"{i} : {temp.name}", value=f"XP: {tempxp}", inline=False
-              )
+              user = ctx.guild.get_member(x["id"])
+              user_xp = x["xp"]
+              text=f"{i} : {user.display_name}\nXP: {user_xp}"
               i += 1
+              menu.add_row(text)
           except:
               pass
           if i == 11:
@@ -134,8 +140,32 @@ class Levels(commands.Cog):
           icon_url=f"{ctx.user.avatar.url}",
         
       )
-    
-      await ctx.channel.send(embed=embed)
+      back_button = ViewButton(
+        style=discord.ButtonStyle.secondary,
+        label="Back",
+        emoji="◀",
+        custom_id=ViewButton.ID_PREVIOUS_PAGE,
+      )
+      menu.add_button(back_button)
+
+      next_button = ViewButton(
+        style=discord.ButtonStyle.primary,
+        label="Next",
+        emoji="▶",
+        custom_id=ViewButton.ID_NEXT_PAGE,
+      )
+      menu.add_button(next_button)
+
+      stop_button =ViewButton(
+        style=discord.ButtonStyle.danger,
+        label="Stop",
+        emoji="🛑",
+        custom_id=ViewButton.ID_END_SESSION
+      )
+      menu.add_button(stop_button)
+      menu.set_main_pages(embed)
+      await menu.start()    
+
 
 
 async def setup(bot):
