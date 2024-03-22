@@ -76,8 +76,6 @@ class Academia(commands.Cog):
             embed.add_field(name="Reason", value=moderation[1], inline=False)
             embed.add_field(name="Author", value=message.author.mention, inline=True)
             embed.add_field(name="Channel", value=channel.mention, inline=True)
-            embed.add_field(name="Content", value=message.content, inline=False)
-
             embed.set_footer(text="This message has been automatically moderated.")
 
             await channel.send(embed=embed)
