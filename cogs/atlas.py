@@ -143,7 +143,7 @@ class Atlas(commands.Cog):
                 description=f"{player.mention} Type a place that starts with: **{current_alphabet}**",
                 color=theme,
             )         
-            while len(order) > 1: 
+            while len(order) > 0: 
 
                 message = await ctx.followup.send(embed=embed)
           
@@ -157,7 +157,8 @@ class Atlas(commands.Cog):
                 except asyncio.TimeoutError:
                     await ctx.followup.send(
                         embed=dembed(
-                            description=f"{player.mention} timed out and has been disqualified"
+                            description=f"{player.mention} timed out and has been disqualified",
+                            color=discord.Color.red()
                         )
                     )
                     order.remove(player.id)
@@ -165,14 +166,16 @@ class Atlas(commands.Cog):
                     if input.content[0].upper() != current_alphabet:
                         await ctx.followup.send(
                             embed=dembed(
-                                description=f"{player.mention} input does not start with the correct letter and has been disqualified"
+                                description=f"{player.mention} input does not start with the correct letter and has been disqualified",
+                                color=discord.Color.red()
                             )
                         )
                         order.remove(player.id)
                     elif not check_result:
                         await ctx.followup.send(
                             embed=dembed(
-                                description=f"{player.mention} entered an invalid place and has been disqualified"
+                                description=f"{player.mention} entered an invalid place and has been disqualified",
+                                color=discord.Color.red()
                             )
                         )
                         order.remove(player.id)
