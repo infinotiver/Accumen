@@ -265,7 +265,7 @@ class Assist(commands.Cog):
         # Send a DM to the asker with the new answer
         if original_questioner_id:
             try:
-                view = assetsb.answercontrol()
+                view = assetsb.answer_control_view()
                 await original_questioner_id.send(
                     "New Answer Received 📩", embed=embed, view=view
                 )
@@ -489,7 +489,7 @@ class Assist(commands.Cog):
         name="channel", description="Set channel where you receive all the queries"
     )
     @commands.has_permissions(manage_messages=True)
-    async def incomingset(
+    async def set_incoming_channel(
         self, ctx,*, channel: discord.TextChannel = None,  disable: bool = False
     ):
         await ctx.response.defer()
