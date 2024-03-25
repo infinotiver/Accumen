@@ -65,14 +65,28 @@ class Academia(commands.Cog):
               except Exception as e:
                  print(e)
       await ctx.followup.send("Cogs Reloaded")
+
+  
     @commands.Cog.listener()
     async def on_message(self, message):
+        # [TODO] store all ids, server ids , channel ids etc. in init func while setting up the cog
         server = message.guild
         if not server or server.id != 976878887004962917:
             return
 
         if len(message.content) < 5 or message.author.bot:
             return  # Skip short messages and messages from bots
+        
+        # Get the "Moderator" role and the number of online members with that role
+        moderator_role = discord.utils.get(server.roles, id=1049696198556131380)
+        if not moderator_role:
+            return
+        # count users in online if there status is either online or do not disturb
+        online_moderators = sum(1 for member in server.members if moderator_role in member.roles and member.status == discord.Status.online)
+
+        # Check if more than 50% of the online members with the  role are currently online
+        if online_moderators > server.member_count / 2:
+            return
 
         channel = self.bot.get_channel(message.channel.id)
         moderation = automod.text_moderation(message.content)
@@ -80,7 +94,7 @@ class Academia(commands.Cog):
             await message.delete()
 
             # Create an embed with detailed information about the moderation action
-            embed = discord.Embed(title="Message Blocked", description="This message has been automatically blocked due to the following reasons:", color=discord.Color.red())
+            embed = dembed(title="Message Blocked", description="This message has been automatically blocked due to the following reasons:", color=discord.Color.red())
 
             # Add fields to the embed to provide more information
             embed.add_field(name="Reason", value=moderation[1], inline=False)
