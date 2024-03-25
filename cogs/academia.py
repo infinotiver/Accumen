@@ -1,3 +1,4 @@
+import hashlib
 import discord
 import json
 from discord.ext import commands,tasks
@@ -8,10 +9,18 @@ import utils.functions as funcs
 from utils.functions import dembed
 import utils.academia as acutils
 import utils.automod as automod
-class Academia(commands.Cog):
-    def __init__(self, bot: commands.Bot) -> None:
+import random
+class Academia(commands.Cog):     
+    def __init__(self, bot: commands.Bot) -> None:   # Initialize the class with the bot object
+        """
+        Initialize the Academia class with the bot object.
+
+        :param bot: The bot object that this cog is associated with.
+        :type bot: commands.Bot
+        :return None
+        """
         self.bot = bot
-        self.data={}
+        self.data = {}
         #self.delete_data.start()
     group = app_commands.Group(
         name="academia",
@@ -19,18 +28,19 @@ class Academia(commands.Cog):
         guild_ids=[976878887004962917],
       
     )
-    @group.command(name="pseudo", description="Send message pseudonymously")
-    async def pseudonymous(self,ctx,message:str):
-      if ctx.user.id in self.data:
-        id=self.data[ctx.user.id]
-      else:
-        id=acutils.gen_random_id(length=7)
-        self.data[ctx.user.id]=id
-      channel=self.bot.get_channel(1197779801432391780)
-      embed=dembed(description=message)
-      embed.set_author(name=id)
-      await channel.send(embed=embed)
-      await ctx.response.send_message("Message sent",ephemeral=True)
+    @commands.command(name="pseudo", description="Send message pseudonymously")
+    async def send_pseudonymous_message(self, ctx, message: str):
+        if ctx.user.id in self.data:
+            id_ = self.data[ctx.user.id]
+        else:
+            id_ = hashlib.sha256(f"{ctx.user.id}{random.random()}".encode()).hexdigest()
+            self.data[ctx.user.id] = id_
+
+        channel = self.bot.get_channel(1197779801432391780)
+        embed = dembed(description=message)
+        embed.set_footer(text=f"Sent by {id_}")
+        await channel.send(embed=embed)
+        await ctx.response.send_message("Message sent", ephemeral=True)
 
     @tasks.loop(seconds = 300) 
     async def delete_data(self):
