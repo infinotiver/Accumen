@@ -1,18 +1,20 @@
 import discord
 import random
-#import nltk
+
+# import nltk
 import datetime
 from typing import Union, List, Dict
 import motor.motor_asyncio
 import nest_asyncio
 import random
 import os
+
 nest_asyncio.apply()
 mongo_url = os.environ.get("mongodb")
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 levelling = cluster["accumen"]["level"]
-#nltk.download("stopwords")
-#nltk.download("punkt")
+# nltk.download("stopwords")
+# nltk.download("punkt")
 theme = 0x01EAFE
 secondary_theme = 0x3E3AF5
 tertiary_theme = 0x271C41
@@ -73,25 +75,27 @@ def dembed(
 
     return embed
 
+
 async def add_xp(user_id, xp_amount):
-  stats = await levelling.find_one({"id": user_id})
+    stats = await levelling.find_one({"id": user_id})
 
-  if stats is None:
-      new_user = {"id": user_id, "xp": xp_amount}
-      await levelling.insert_one(new_user)
-  else:
-      xp = stats["xp"] + xp_amount
-      levelling.update_one({"id": user_id}, {"$set": {"xp": xp}})
+    if stats is None:
+        new_user = {"id": user_id, "xp": xp_amount}
+        await levelling.insert_one(new_user)
+    else:
+        xp = stats["xp"] + xp_amount
+        levelling.update_one({"id": user_id}, {"$set": {"xp": xp}})
 
-      lvl = 0
-      while True:
-          if xp < ((50 * (lvl ** 2)) + (50 * (lvl))):
-              break
-          lvl += 1
-      xp -= (50 * ((lvl - 1) ** 2)) + (50 * (lvl - 1))
+        lvl = 0
+        while True:
+            if xp < ((50 * (lvl**2)) + (50 * (lvl))):
+                break
+            lvl += 1
+        xp -= (50 * ((lvl - 1) ** 2)) + (50 * (lvl - 1))
 
-      if xp == 0:
-          return f"Well done <@{user_id}>! You leveled up to **level: {lvl}**"
+        if xp == 0:
+            return f"Well done <@{user_id}>! You leveled up to **level: {lvl}**"
+
 
 language_dict = [
     {"name": "Arabic", "code": "ar", "longCode": "ar"},
@@ -140,6 +144,3 @@ def extract_keyword(title, description):
 
     return keyword
 """
-
-
-
