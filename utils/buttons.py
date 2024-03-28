@@ -16,7 +16,7 @@ cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 queries_col = cluster["accumen"]["queries"]
 incoming = cluster["accumen"]["incoming"]
 system=cluster["accumen"]["system"]
-class contro(discord.ui.View):
+class developer_controls(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
@@ -30,10 +30,11 @@ class contro(discord.ui.View):
         results = await system.find_one({"_id": "commands_usage"})
         count=str(results["count"])
         system_latency = round(interaction.client.latency * 1000)
-        embed=funcs.dembed(title="Stats",description=f"**TotalCommand Used:** {count}\n**Total Queries:** "+str(await queries_col.count_documents({})))
+        embed=funcs.dembed(title="Stats",description=f"**Total Command Used:** {count}\n**Total Queries:** "+str(await queries_col.count_documents({})))
         embed.set_thumbnail(url=interaction.client.user.avatar.url)
-        embed.add_field(name="Ping", value=f"{system_latency} ms", inline=False)
-        embed.add_field(name="Servers", value=f"{len(interaction.client.guilds)}", inline=True)
+        embed.add_field(name="Ping", value=f"{system_latency} ms", inline = False)
+        embed.add_field(name="Servers", value=f"{len(interaction.client.guilds)}", inline = True)
+        embed.add_field(name="Users", value=f"{len(interaction.client.users)}", inline = True)
         await interaction.response.send_message(embed=embed,ephemeral=True)
 
 class answer_control_view(discord.ui.View):

@@ -66,7 +66,7 @@ async def on_ready():
     system_latency = round(client.latency * 1000)
     ctime=datetime.datetime.now()
     unixtime = time.mktime(ctime.timetuple())
-    view=ubuttons.contro()
+    view=ubuttons.developer_controls()
     em = dembed(title=f"{client.user.name} is online !")
     em.set_thumbnail(url=client.user.avatar.url)
     em.add_field(name="Ping", value=f"{system_latency} ms", inline=False)
