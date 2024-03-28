@@ -29,7 +29,8 @@ def text_moderation(text):
       # Check if any score exceeds the corresponding threshold
       for category, score in data.items():
           if score > thresholds[category]:
-              return True, f"Message flagged for {category.capitalize()}. Score: {score:.4f}"
+              confidence=score*100
+              return True, f"Message flagged for {category.capitalize()}. Confidence: {confidence:.4f}"
 
       # No flags raised
       return False, ""
