@@ -15,13 +15,12 @@ def text_moderation(text):
 
   try:
       data = response.json()
-      print(data)
       # Define thresholds 
       thresholds = {
           "toxic": 0.95,
           "threat": 0.8,
           "offensive": 0.95,
-          "erotic": 0.7,
+          "erotic": 0.5,
           "indecent":1, # Practically impossible
           "spam": 0.95  # Higher threshold for spam to avoid false positives
       }
@@ -30,7 +29,7 @@ def text_moderation(text):
       for category, score in data.items():
           if score > thresholds[category]:
               confidence=score*100
-              return True, f"Message flagged for {category.capitalize()}. Confidence: {confidence:.4f}"
+              return True, f"Message flagged for **{category.capitalize()}**. Confidence: **{confidence:.4f}**"
 
       # No flags raised
       return False, ""
