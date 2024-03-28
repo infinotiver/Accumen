@@ -5,7 +5,9 @@ import os
 import motor.motor_asyncio
 import nest_asyncio
 from discord import app_commands
-
+import typing
+import utils.functions as funcs
+from utils.functions import dembed
 # Database connection (replace with your credentials)
 mongo_url = os.environ["mongodb"]
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
@@ -25,11 +27,41 @@ class Resource(commands.Cog):
         guild_ids=[976878887004962917],
     )
 
+    async def resource_name_autocompletion(
+        self, interaction: discord.Interaction, current: str
+    ) -> typing.List[app_commands.Choice[str]]:
+        data = []
+        queries_cursor = resources_collection.find(
+            {}
+        )  
+        async for (
+            query
+        ) in queries_cursor:  # Iterate over the cursor to construct the choices
+            title_words = query["name"].split()
+            title= query["name"]
+            id = query["id"]
+            for word in title_words:
+                if current.lower() in map(str.lower, title_words):
+                    data.append(
+                        app_commands.Choice(name=f"{title} - {id}", value=query["id"])
+                    )
+                    break
+        return data
     @group.command(name="submit")
+    @app_commands.choices(
+        resource_type=[
+            app_commands.Choice(name="Class Notes", value="class_notes"),
+            app_commands.Choice(name="Revision Sheets", value="revision_sheets"),
+            app_commands.Choice(name="Old Periodic/Weekly Assessments",value="assessments"),
+            app_commands.Choice(name="Previous Year Final Exam Question Papers",value="question_paper"),
+            app_commands.Choice(name="Online Resources",value="online_resources"),
+            app_commands.Choice(name="Others",value="others")
+        ]
+    )
     async def submit(
         self,
         ctx,
-        resource_type: str,
+        resource_type: app_commands.Choice[str],
         name: str,
         attachment: discord.Attachment = None,
         *,
@@ -41,9 +73,9 @@ class Resource(commands.Cog):
         attachment_url = attachment.url
 
         # Basic validation
-        if len(name) < 3:
+        if len(name) < 5:
             await ctx.response.send_message(
-                "**Resource name must be at least 3 characters long.**"
+                "**Resource name must be at least 5 characters long.**"
             )
             return
         if len(description) < 10:
@@ -51,10 +83,11 @@ class Resource(commands.Cog):
                 "**Resource description must be at least 10 characters long.**"
             )
             return
-
+        id = str(await resources_collection.count_documents({}) + 1)
         # Store resource details in database
         new_resource = {
-            "type": resource_type,
+            "id":id,
+            "type": resource_type.value,
             "name": name,
             "description": description,
             "author": ctx.user.id,
@@ -68,7 +101,7 @@ class Resource(commands.Cog):
 
         # Send confirmation message
         await ctx.response.send_message(
-            f"**Thank you, {ctx.user.mention}! Your resource '{name}' has been submitted for review.**"
+            embed=dembed(description=f"Thank you, {ctx.user.mention}! Your resource '**{name}**' (ID : `{id}` ) has been submitted for review.")
         )
 
         # Notify reviewers (optional)
@@ -76,36 +109,38 @@ class Resource(commands.Cog):
             reviewer = self.bot.get_user(reviewer_id)
             if reviewer:
                 await reviewer.send(
-                    f"**A new resource '{name}' needs review! (Channel: {ctx.channel.mention})**"
+                    f"**A new resource '{name}'(ID : `{id}` ) needs review!**"
                 )
 
     @group.command(name="review")
     @commands.has_permissions(manage_messages=True)
-    async def review(self, ctx, name: str, action: str):
+    @app_commands.choices(
+        action=[
+            app_commands.Choice(name="Approve 👍🏻", value="approve"),
+            app_commands.Choice(name="Reject 👎🏻", value="reject"),
+        ]
+    )
+    @app_commands.autocomplete(name=resource_name_autocompletion)
+    async def review(self, ctx, name: str, action: app_commands.Choice[str]):
         """Reviews a submitted resource (approve/reject)."""
         # Check if resource exists and user has permissions
-        resource = resources_collection.find_one({"name": name})
+        resource = resources_collection.find_one({"id": name.value})
         if not resource or not ctx.user.guild_permissions.manage_messages:
             await ctx.response.send_message("**You cannot review resources.**")
             return
 
-        # Validate action
-        if action.lower() not in ["approve", "reject"]:
-            await ctx.response.send_message(
-                "**Invalid action. Please use 'approve' or 'reject'.**"
-            )
-            return
+        action = action.value
 
         # Update resource status and votes
         resource["votes"][action.lower()] += 1
-        resources_collection.update_one({"_id": resource["_id"]}, {"$set": resource})
+        resources_collection.update_one({"id": resource["id"]}, {"$set": resource})
 
         # Check for required approvals and post to forum
         if resource["votes"]["approve"] >= self.required_approvals:
             await self.post_to_forum(resource)
-            resources_collection.delete_one({"_id": resource["_id"]})
+            resources_collection.delete_one({"id": resource["id"]})
         elif resource["votes"]["reject"] > 0:
-            resources_collection.delete_one({"_id": resource["_id"]})
+            resources_collection.delete_one({"id": resource["id"]})
 
         # Notify author
         author = self.bot.get_user(resource["author"])
@@ -116,7 +151,7 @@ class Resource(commands.Cog):
 
         # Send confirmation message to reviewer
         await ctx.response.send_message(
-            f"**Resource '{name}' has been voted {action.upper()}d.**"
+            f"**Resource '{name}' has been voted {action.upper()}(e)d.**"
         )
 
     @group.command(name="search")
@@ -128,7 +163,7 @@ class Resource(commands.Cog):
         # Pagination logic (adjust page size as needed)
         page_size = 10
         skip = (page - 1) * page_size
-        sort = {"_id": -1}  # Sort by newest first
+        sort = {"id": -1}  # Sort by newest first
 
         # Search resources in database
         resource_cursor = (
