@@ -22,10 +22,15 @@ class Academia(commands.Cog):
         self.bot = bot
         self.data = {}
         #self.delete_data.start()
+        self.anonymous_chat_channel_id=1197779801432391780
+        self.academia_server_id=1197779801432391780
+        self.moderator_role_id=1049696198556131380
+
+
     group = app_commands.Group(
         name="academia",
         description="Academia only commands",
-        guild_ids=[976878887004962917],
+        guild_ids=[self.academia_server_id],
       
     )
     @commands.command(name="pseudo", description="Send message pseudonymously")
@@ -36,7 +41,7 @@ class Academia(commands.Cog):
             id_ = hashlib.sha256(f"{ctx.user.id}{random.random()}".encode()).hexdigest()
             self.data[ctx.user.id] = id_
 
-        channel = self.bot.get_channel(1197779801432391780)
+        channel = self.bot.get_channel(self.anonymous_chat_channel_id)
         embed = dembed(description=message)
         embed.set_footer(text=f"Sent by {id_}")
         await channel.send(embed=embed)
@@ -71,14 +76,14 @@ class Academia(commands.Cog):
     async def on_message(self, message):
         # [TODO] store all ids, server ids , channel ids etc. in init func while setting up the cog
         server = message.guild
-        if not server or server.id != 976878887004962917:
+        if not server or server.id != self.academia_server_id:
             return
 
         if len(message.content) < 5 or message.author.bot:
             return  # Skip short messages and messages from bots
         
         # Get the "Moderator" role and the number of online members with that role
-        moderator_role = discord.utils.get(server.roles, id=1049696198556131380)
+        moderator_role = discord.utils.get(server.roles, id=self.moderator_role_id)
         if not moderator_role:
             return
         # count users in online if there status is either online or do not disturb
