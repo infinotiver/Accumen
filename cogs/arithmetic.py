@@ -75,7 +75,7 @@ class Numbers(commands.Cog):
         description="Mathematical operations and calculations",
     )
     facts = app_commands.Group(
-        name="fun-maths",
+        name="fun",
         description="Interesting facts about numbers",
     )
 
@@ -179,7 +179,7 @@ class Numbers(commands.Cog):
         url = "https://numbersapi.p.rapidapi.com/random/trivia"
         querystring = {
             "min": "1",
-            "max": "20",
+            "max": "200",
             "fragment": "false",
             "notfound": "floor",
             "json": "true",
@@ -205,7 +205,7 @@ class Numbers(commands.Cog):
         )
 
     @group.command(
-        name="simple-functions", description="Perform various mathematical functions s"
+        name="simple-functions", description="Perform various simple mathematical functions "
     )
     @app_commands.choices(
         func=[
@@ -228,14 +228,14 @@ class Numbers(commands.Cog):
         if func.value == "lcm":
             try:
                 ans = calculate_lcm(num_string)
-                text = f"LCM : {ans}"
+                text = f"Lowest Common Multiple (LCM) : {ans}"
             except ValueError as e:
                 await ctx.response.send_message(embed=dembed(description=str(e)))
                 return
         elif func.value == "hcf":
             try:
                 ans = calculate_gcd(num_string)
-                text = f"HCF/GCD : {ans}"
+                text = f"Highest Common Factor (HCF) / Greatest Common Divisor (GCD) : {ans}"
             except ValueError as e:
                 await ctx.response.send_message(embed=dembed(description=str(e)))
                 return
@@ -253,7 +253,7 @@ class Numbers(commands.Cog):
             return
         if number == 0 or number == 1:
             await ctx.response.send_message(
-                embed=dembed(description="0 or 1 not allowed")
+                embed=dembed(description="0 or 1 are not allowed")
             )
             return
         result = prime_factorization(number)
@@ -292,10 +292,10 @@ class Numbers(commands.Cog):
             # H ==> R
             result = converter.int_to_Roman(num=int(number))
 
-            text = f"### Hindu Arabic to Roman\n**Result** : {result}"
+            text = f"### Hindu Arabic to Roman\n**Result** : \n # {result}"
         else:
             result = converter.roman_to_int(str(number))
-            text = f"### Roman to Hindu Arabic\n**Result** : {result}"
+            text = f"### Roman to Hindu Arabic\n**Result** : \n # {result}"
         embed = dembed(description=text)
         await ctx.response.send_message(embed=embed)
 
