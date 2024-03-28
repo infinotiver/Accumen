@@ -30,7 +30,7 @@ async def fetch_data(place=None):
         all_locations.append("Australia")
         all_locations.append(
             "Oceania"
-        )  #  [Todo] Consider Merging Australia and Oceania
+        )  #  [TODO] Consider Merging Australia and Oceania
         all_locations.append("Antarctica")
 
         if not place:
@@ -44,10 +44,10 @@ async def fetch_data(place=None):
     except JSONDecodeError as json_error:
         print(f"JSON decoding error: {json_error}")
         print(f"Problematic response: {response.text}")
-        return None  # Handle the error appropriately in your code
+        return None
     except requests.RequestException as req_error:
         print(f"Request error: {req_error}")
-        return None  # Handle the error appropriately in your code
+        return None
 
 
 class Atlas(commands.Cog):
