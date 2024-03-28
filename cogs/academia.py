@@ -21,7 +21,6 @@ class Academia(commands.Cog):
         """
         self.bot = bot
         self.data = {}
-        #self.delete_data.start()
         self.anonymous_chat_channel_id=1197779801432391780
         self.academia_server_id=1197779801432391780
         self.moderator_role_id=1049696198556131380
@@ -47,10 +46,6 @@ class Academia(commands.Cog):
         await channel.send(embed=embed)
         await ctx.response.send_message("Message sent", ephemeral=True)
 
-    @tasks.loop(seconds = 300) 
-    async def delete_data(self):
-     #self.data={}
-     pass
     @group.command(name="reload",description="Reload cogs")
     @commands.is_owner()
     async def reload(self,ctx):
