@@ -3,6 +3,7 @@ TODO
   - Add Dynamic views
   - Add points and levelling system
 """
+
 import discord
 from discord.ext import commands, tasks
 from discord import app_commands
@@ -31,7 +32,9 @@ incoming = cluster["accumen"]["incoming"]
 def delete_everything():
     queries_col.delete_many({})
     print("Deleted Everything")
-#delete_everything()
+
+
+# delete_everything()
 SUBJECTS = {
     "Languages": "language",
     "Mathematics": "mathematics",
@@ -106,7 +109,9 @@ class Assist(commands.Cog):
         queries_cursor = queries_col.find(
             {}
         )  # Use the find method to query the collection
-        async for query in queries_cursor:  # Iterate over the cursor to construct the choices
+        async for (
+            query
+        ) in queries_cursor:  # Iterate over the cursor to construct the choices
             title_words = query["title"].split()
             for word in title_words:
                 if current.lower() in map(str.lower, title_words):
@@ -157,9 +162,9 @@ class Assist(commands.Cog):
         timestamp = format_dt(ctx.created_at, "R")
         des = f"**{id}** ∙ Posted in {ctx.guild.name} , {timestamp}\n{divider}\n **{description}**"
         embed.description = des
-        xp_message=await funcs.add_xp(ctx.user.id,50)
+        xp_message = await funcs.add_xp(ctx.user.id, 50)
         if xp_message:
-          await ctx.followup.send(embed=xp_message)
+            await ctx.followup.send(embed=xp_message)
         sent_embed = dembed(
             title="Query posted",
             description="Keep your direct messages open to receive answers.\nYou earned 50 xp to post a query",
@@ -173,7 +178,7 @@ class Assist(commands.Cog):
                 guild = await self.bot.fetch_guild(int(x["id"]))
                 channel = self.bot.get_channel(int(x["channel"]))
 
-                view =  assetsb.Qrscontrol()
+                view = assetsb.Qrscontrol()
                 view.add_item(
                     discord.ui.Button(
                         label="Community",
@@ -181,9 +186,9 @@ class Assist(commands.Cog):
                         url="https://discord.gg/Nvts32BAwr",
                     )
                 )
-                #view.add_item(assetsb.dynamic_add_answer(ctx.user.id))
-                #view.add_item(assetsb.dynamic_upvote(ctx.user.id))
-                #view.add_item(assetsb.dynamic_report(ctx.user.id))
+                # view.add_item(assetsb.dynamic_add_answer(ctx.user.id))
+                # view.add_item(assetsb.dynamic_upvote(ctx.user.id))
+                # view.add_item(assetsb.dynamic_report(ctx.user.id))
                 msg = await channel.send(
                     content="### New Query", embed=embed, view=view
                 )
@@ -233,8 +238,10 @@ class Assist(commands.Cog):
                     embed=dembed(description="You have already answered this query.")
                 )
                 return
-        if user_id==query.get("user_id"):
-            await ctx.followup.send( embed=dembed(description="You cannot answer your own query."))
+        if user_id == query.get("user_id"):
+            await ctx.followup.send(
+                embed=dembed(description="You cannot answer your own query.")
+            )
             return
         # Add the answer to the query document
         if "answers" not in query:
@@ -258,10 +265,12 @@ class Assist(commands.Cog):
         embed = dembed(title="New Answer", description=des, color=theme)
         embed.set_author(name=ctx.user.name, icon_url=ctx.user.avatar.url)
         embed.set_footer(text=f"{str(ctx.user.name)} [{str(ctx.user.id)}]")
-        xp_message=await funcs.add_xp(ctx.user.id,20)
+        xp_message = await funcs.add_xp(ctx.user.id, 20)
         if xp_message:
-          await ctx.followup.send(embed=xp_message)
-        await ctx.followup.send(embed=dembed(description="Query answered successfully\nYou earned 20 XP"))
+            await ctx.followup.send(embed=xp_message)
+        await ctx.followup.send(
+            embed=dembed(description="Query answered successfully\nYou earned 20 XP")
+        )
         # Send a DM to the asker with the new answer
         if original_questioner_id:
             try:
@@ -269,7 +278,7 @@ class Assist(commands.Cog):
                 await original_questioner_id.send(
                     "New Answer Received 📩", embed=embed, view=view
                 )
-            except Exception as e :
+            except Exception as e:
                 print(f"Cant send message to original questioner {e}")
 
     @group.command(name="list", description="List all the queries")
@@ -490,7 +499,7 @@ class Assist(commands.Cog):
     )
     @commands.has_permissions(manage_messages=True)
     async def set_incoming_channel(
-        self, ctx,*, channel: discord.TextChannel = None,  disable: bool = False
+        self, ctx, *, channel: discord.TextChannel = None, disable: bool = False
     ):
         await ctx.response.defer()
         if not disable:

@@ -27,7 +27,9 @@ class Language(commands.Cog):
         name="language", description="Execute language-related commands."
     )
 
-    @group.command(name="grammar",description="Lists out grammatical improvements for a sentence")
+    @group.command(
+        name="grammar", description="Lists out grammatical improvements for a sentence"
+    )
     @app_commands.choices(language=language_choices)
     @app_commands.describe(query_text="The message to check for grammar errors.")
     async def grammar(
@@ -98,11 +100,11 @@ class Language(commands.Cog):
             )
             menu.add_button(next_button)
 
-            stop_button =ViewButton(
+            stop_button = ViewButton(
                 style=discord.ButtonStyle.danger,
                 label="Stop",
                 emoji="🛑",
-                custom_id=ViewButton.ID_END_SESSION
+                custom_id=ViewButton.ID_END_SESSION,
             )
             menu.add_button(stop_button)
             await menu.start()
@@ -111,11 +113,14 @@ class Language(commands.Cog):
             await ctx.followup.send(
                 embed=dembed(
                     title="You are good to go",
-                    description="There are no grammatical improvements for that sentence."
+                    description="There are no grammatical improvements for that sentence.",
                 )
             )
 
-    @group.command(name="define",description="Get definition of a word along with other useful information")
+    @group.command(
+        name="define",
+        description="Get definition of a word along with other useful information",
+    )
     @app_commands.describe(text="The word to define.")
     async def dictionary(self, ctx, text: str):
         await ctx.response.defer()

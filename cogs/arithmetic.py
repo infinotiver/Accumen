@@ -79,7 +79,9 @@ class Numbers(commands.Cog):
         description="Interesting facts about numbers",
     )
 
-    @group.command(name="wolfram", description="Query Wolfram Alpha for mathematical expressions.")
+    @group.command(
+        name="wolfram", description="Query Wolfram Alpha for mathematical expressions."
+    )
     @app_commands.describe(query="The query string to send to Wolfram Alpha")
     async def wolf(self, ctx, query: str):
         wolfid = os.environ["wolf"]
@@ -105,7 +107,8 @@ class Numbers(commands.Cog):
         )
 
     @group.command(
-        name="calculate", description="Access an interactive calculator to perform calculations."
+        name="calculate",
+        description="Access an interactive calculator to perform calculations.",
     )
     async def interactive_calc(self, ctx):
         view = calc.InteractiveView()
@@ -169,7 +172,9 @@ class Numbers(commands.Cog):
             embed=dembed(title=d["number"], description=d["text"], footer=date)
         )
 
-    @facts.command(name="maths-trivia", description="Get trivia facts about random integers.")
+    @facts.command(
+        name="maths-trivia", description="Get trivia facts about random integers."
+    )
     async def triviafact(self, ctx):
         url = "https://numbersapi.p.rapidapi.com/random/trivia"
         querystring = {
@@ -199,7 +204,9 @@ class Numbers(commands.Cog):
             embed=dembed(title=d["number"], description=d["text"])
         )
 
-    @group.command(name="simple-functions", description="Perform various mathematical functions s")
+    @group.command(
+        name="simple-functions", description="Perform various mathematical functions s"
+    )
     @app_commands.choices(
         func=[
             app_commands.Choice(name=name, value=value)
@@ -234,7 +241,9 @@ class Numbers(commands.Cog):
                 return
         await ctx.response.send_message(embed=dembed(description=text))
 
-    @group.command(name="factorial", description="Calculate the factorial of a given number.")
+    @group.command(
+        name="factorial", description="Calculate the factorial of a given number."
+    )
     @app_commands.describe(number="The number to calculate the factorial for")
     async def prime_factors(self, ctx, number: int):
         if number < 0:

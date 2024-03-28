@@ -28,7 +28,9 @@ async def fetch_data(place=None):
         all_locations.append("North America")
         all_locations.append("South America")
         all_locations.append("Australia")
-        all_locations.append("Oceania") #  [Todo] Consider Merging Australia and Oceania 
+        all_locations.append(
+            "Oceania"
+        )  #  [Todo] Consider Merging Australia and Oceania
         all_locations.append("Antarctica")
 
         if not place:
@@ -89,14 +91,17 @@ class Atlas(commands.Cog):
     async def enter(self, ctx):
         await ctx.response.defer()
         if str(ctx.guild.id) not in self.games:
-            return await ctx.followup.send("No game is currently running in this server")
+            return await ctx.followup.send(
+                "No game is currently running in this server"
+            )
         elif ctx.user.id in self.games[str(ctx.guild.id)]["users"]:
             return await ctx.followup.send("You are already in the game")
         elif ctx.channel.id != self.games[str(ctx.guild.id)]["channel"]:
             return await ctx.followup.send("This is not the correct game channel")
         elif len(self.games[str(ctx.guild.id)]["users"]) > 5:
             return await ctx.followup.send(
-                "Currently, more than 5 participants can not play in a single game")
+                "Currently, more than 5 participants can not play in a single game"
+            )
         else:
             self.games[str(ctx.guild.id)]["users"].append(ctx.user.id)
             channel = await self.bot.fetch_channel(
@@ -122,19 +127,24 @@ class Atlas(commands.Cog):
             )
         elif len(self.games[str(ctx.guild.id)]["users"]) < 1:
             return await ctx.followup.send(
-                embed=dembed(description="Insufficient members for game (At least 2 members required)")
+                embed=dembed(
+                    description="Insufficient members for game (At least 2 members required)"
+                )
             )
         elif self.games[str(ctx.guild.id)]["time"]["started"] != 0:
             return await ctx.followup.send(
-              embed=dembed(description="Game has already been started by someone",ephemeral=True)
+                embed=dembed(
+                    description="Game has already been started by someone",
+                    ephemeral=True,
+                )
             )
         else:
-      
+
             self.games[str(ctx.guild.id)]["time"][
                 "started"
             ] = ctx.created_at.timestamp()
             order = self.games[str(ctx.guild.id)]["users"].copy()
-            original_order = self.games[str(ctx.guild.id)]["users"  ].copy()
+            original_order = self.games[str(ctx.guild.id)]["users"].copy()
             player_index = 0
             current_alphabet = "S"
             player = await self.bot.fetch_user(order[player_index])
@@ -142,11 +152,11 @@ class Atlas(commands.Cog):
                 title="ATLAS Started",
                 description=f"{player.mention} Type a place that starts with: **{current_alphabet}**",
                 color=theme,
-            )         
-            while len(order) > 0: 
+            )
+            while len(order) > 0:
 
                 message = await ctx.followup.send(embed=embed)
-          
+
                 def check(msg):
                     return msg.author.id == player.id
 
@@ -158,7 +168,7 @@ class Atlas(commands.Cog):
                     await ctx.followup.send(
                         embed=dembed(
                             description=f"{player.mention} timed out and has been disqualified",
-                            color=discord.Color.red()
+                            color=discord.Color.red(),
                         )
                     )
                     order.remove(player.id)
@@ -167,7 +177,7 @@ class Atlas(commands.Cog):
                         await ctx.followup.send(
                             embed=dembed(
                                 description=f"{player.mention} input does not start with the correct letter and has been disqualified",
-                                color=discord.Color.red()
+                                color=discord.Color.red(),
                             )
                         )
                         order.remove(player.id)
@@ -175,14 +185,18 @@ class Atlas(commands.Cog):
                         await ctx.followup.send(
                             embed=dembed(
                                 description=f"{player.mention} entered an invalid place and has been disqualified",
-                                color=discord.Color.red()
+                                color=discord.Color.red(),
                             )
                         )
                         order.remove(player.id)
                     else:
-                        current_alphabet = input_content[-1]  # Change current_alphabet to last letter of place if msg is valid
+                        current_alphabet = input_content[
+                            -1
+                        ]  # Change current_alphabet to last letter of place if msg is valid
                         player_index = (player_index + 1) % len(order)
-                        self.games[str(ctx.guild.id)]["places_done"].append(input.content)
+                        self.games[str(ctx.guild.id)]["places_done"].append(
+                            input.content
+                        )
                         try:
                             await input.delete()
                         except:
@@ -224,9 +238,10 @@ class Atlas(commands.Cog):
             await ctx.followup.send(embed=game_embed)
             del self.games[str(ctx.guild.id)]
             await ctx.followup.send(
-                embed=dembed(description=f"The Game has ended. The winner is {winner.mention}")
+                embed=dembed(
+                    description=f"The Game has ended. The winner is {winner.mention}"
+                )
             )
-
 
 
 async def setup(bot):

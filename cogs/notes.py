@@ -33,7 +33,9 @@ class SelfNotes(commands.Cog):
         embed = dembed(title=title, description=description)
         await ctx.followup.send(embed=embed)
 
-    notes = app_commands.Group(name="notes", description="Store your most important stuff and (maybe) secrets")
+    notes = app_commands.Group(
+        name="notes", description="Store your most important stuff and (maybe) secrets"
+    )
 
     @notes.command(name="view", description="Shows your saved notes")
     async def view(self, ctx):
