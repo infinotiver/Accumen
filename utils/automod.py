@@ -22,6 +22,7 @@ def text_moderation(text):
           "threat": 0.8,
           "offensive": 0.95,
           "erotic": 0.7,
+          "indecent":1, # Practically impossible
           "spam": 0.95  # Higher threshold for spam to avoid false positives
       }
 
