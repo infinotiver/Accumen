@@ -103,12 +103,12 @@ class Levels(commands.Cog):
           """
             # image = await card.card3()
             message = (
-                f"{ctx.user.name}'s Level stats\n"
-                f"Name: {ctx.user.mention}\n"
-                f"XP: {xp}/{int(200 * ((1 / 2) * lvl))}\n"
-                f"Global Rank: {rank}\n"
-                f"Level: {lvl}\n"
-                f"Progress Bar [lvl]: {progress_bar}\n"
+                f"{ctx.user.mention}'s Level stats\n"
+                f"Name: **{ctx.user.mention}**\n"
+                f"XP: **{xp}/{int(200 * ((1 / 2) * lvl))}**\n"
+                f"Global Rank: **{rank}**\n"
+                f"Level: **{lvl}**\n"
+                f"Progress Bar : {progress_bar}\n"
             )
             embed = dembed(description=message)
             await ctx.followup.send(
@@ -118,6 +118,9 @@ class Levels(commands.Cog):
 
     @group.command(name="leaderboard", description="Shows the global leaderboard")
     async def lb(self, ctx):
+        await ctx.response.send_message(
+            embed=dembed(description="Wait till I fetch the latest details")
+        )
         rankings = levelling.find().sort("xp", -1)
         i = 1
         embed = dembed(
