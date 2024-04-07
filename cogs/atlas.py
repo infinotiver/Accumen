@@ -116,6 +116,7 @@ class Atlas(commands.Cog):
 
     @atlas.command(name="game-start", description="Start a game of ATLAS")
     async def start(self, ctx):
+        # TODO correct playing game order, and lists. Don't edit previous msg
         await ctx.response.defer()
         if str(ctx.guild.id) not in self.games:
             return await ctx.followup.send(

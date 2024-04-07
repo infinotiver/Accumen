@@ -108,9 +108,9 @@ class Levels(commands.Cog):
                 f"XP: **{xp}/{int(200 * ((1 / 2) * lvl))}**\n"
                 f"Global Rank: **{rank}**\n"
                 f"Level: **{lvl}**\n"
-                f"Progress Bar : {progress_bar}\n"
+                f"Progress Bar : **{progress_bar}**\n"
             )
-            embed = dembed(description=message)
+            embed = dembed(description=message, thumbnail=ctx.user.avatar.url)
             await ctx.followup.send(
                 embed=embed,
                 # file=discord.File(image, filename="rank.png")
@@ -120,7 +120,7 @@ class Levels(commands.Cog):
     async def lb(self, ctx):
         await ctx.response.send_message(
             embed=dembed(description="Wait till I fetch the latest details")
-        )
+            )
         rankings = levelling.find().sort("xp", -1)
         i = 1
         embed = dembed(

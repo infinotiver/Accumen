@@ -8,6 +8,7 @@ from discord import app_commands
 import typing
 import utils.functions as funcs
 from utils.functions import dembed
+
 # Database connection (replace with your credentials)
 mongo_url = os.environ["mongodb"]
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
@@ -31,14 +32,12 @@ class Resource(commands.Cog):
         self, interaction: discord.Interaction, current: str
     ) -> typing.List[app_commands.Choice[str]]:
         data = []
-        queries_cursor = resources_collection.find(
-            {}
-        )  
+        queries_cursor = resources_collection.find({})
         async for (
             query
         ) in queries_cursor:  # Iterate over the cursor to construct the choices
             title_words = query["name"].split()
-            title= query["name"]
+            title = query["name"]
             id = query["id"]
             for word in title_words:
                 if current.lower() in map(str.lower, title_words):
@@ -47,15 +46,20 @@ class Resource(commands.Cog):
                     )
                     break
         return data
+
     @group.command(name="submit")
     @app_commands.choices(
         resource_type=[
             app_commands.Choice(name="Class Notes", value="class_notes"),
             app_commands.Choice(name="Revision Sheets", value="revision_sheets"),
-            app_commands.Choice(name="Old Periodic/Weekly Assessments",value="assessments"),
-            app_commands.Choice(name="Previous Year Final Exam Question Papers",value="question_paper"),
-            app_commands.Choice(name="Online Resources",value="online_resources"),
-            app_commands.Choice(name="Others",value="others")
+            app_commands.Choice(
+                name="Old Periodic/Weekly Assessments", value="assessments"
+            ),
+            app_commands.Choice(
+                name="Previous Year Final Exam Question Papers", value="question_paper"
+            ),
+            app_commands.Choice(name="Online Resources", value="online_resources"),
+            app_commands.Choice(name="Others", value="others"),
         ]
     )
     async def submit(
@@ -86,7 +90,7 @@ class Resource(commands.Cog):
         id = str(await resources_collection.count_documents({}) + 1)
         # Store resource details in database
         new_resource = {
-            "id":id,
+            "id": id,
             "type": resource_type.value,
             "name": name,
             "description": description,
@@ -101,7 +105,9 @@ class Resource(commands.Cog):
 
         # Send confirmation message
         await ctx.response.send_message(
-            embed=dembed(description=f"Thank you, {ctx.user.mention}! Your resource '**{name}**' (ID : `{id}` ) has been submitted for review.")
+            embed=dembed(
+                description=f"Thank you, {ctx.user.mention}! Your resource '**{name}**' (ID : `{id}` ) has been submitted for review."
+            )
         )
 
         # Notify reviewers (optional)

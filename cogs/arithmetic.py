@@ -205,7 +205,8 @@ class Numbers(commands.Cog):
         )
 
     @group.command(
-        name="simple-functions", description="Perform various simple mathematical functions "
+        name="simple-functions",
+        description="Perform various simple mathematical functions ",
     )
     @app_commands.choices(
         func=[
