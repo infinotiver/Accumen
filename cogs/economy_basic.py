@@ -24,8 +24,8 @@ mongo_url = os.environ["mongodb"]
 cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
 economy_collection = cluster["accumen"]["economy"]
 
-coin_emoji = ''
-gem_emoji = ''
+coin_emoji = '<:c_:1090623584432570440>'
+gem_emoji = '<:d_:1090623594893160458>'
 class Economy_Basic(commands.Cog):
 
     def __init__(self, bot):
@@ -34,27 +34,22 @@ class Economy_Basic(commands.Cog):
 
     @app_commands.command(name="balance", description="Shows your balance")
     async def balance(self, ctx, user: discord.Member = None):
-        if user is None:
-            user = ctx.user
+        user = user or ctx.user
         try:
             bal = await economy_functions.get_user_data(user.id)
             if bal is None:
-                await self.open_account(user.id)
-                await economy_functions.get_user_data(user.id)
-            embed = dembed(
-                title=f"{user.name}'s Balance",
-                description=f"{user.mention}'s balance is a wondrous sight to behold.\n",
-                thumbnail=user.avatar.url
+                await economy_functions.open_account(user.id)
+                bal = await economy_functions.get_user_data(user.id)
+            embed = (
+                dembed(title=f"{user.display_name}'s Balance", thumbnail=user.avatar.url)
             )
-
-            embed.add_field(name="Coins", value=f"{coin_emoji} {bal["coins"]}", inline=True)
-
-            embed.add_field(name="Gems", value=f"{gem_emoji} {bal["gems"]}", inline=True)
+            embed.add_field(name="Coins", value=f"{coin_emoji} {bal['coins']}", inline=True)
+            embed.add_field(name="Gems", value=f"{gem_emoji} {bal['gems']}", inline=True)
+            embed.set_footer(icon_url=ctx.user.avatar)
             
-            embed.set_footer(icon_url=ctx.user.avatar.url)
-            await ctx.response.send_message(embed=embed)
+            await ctx.response.send_message(embed=embed, ephemeral=True)
         except Exception as e:
-            await ctx.send(f"An error occurred {e}")
+            await ctx.response.send_message(f"An error occurred: {e}", ephemeral=True)
 
 
 async def setup(bot):
