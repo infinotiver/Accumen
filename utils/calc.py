@@ -7,7 +7,8 @@ from utils.functions import dembed
 class InteractiveView(discord.ui.View):
     def __init__(self):
         super().__init__()
-        self.expr = ""
+        if simpcalc.Calculate is None:
+            raise AttributeError("Calculate class is not defined in simpcalc module.")
         self.calc = simpcalc.Calculate()
 
     @discord.ui.button(style=discord.ButtonStyle.gray, label="1", row=0)
