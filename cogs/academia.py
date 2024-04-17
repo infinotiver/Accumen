@@ -32,7 +32,7 @@ class Academia(commands.Cog):
     group = app_commands.Group(
         name="academia",
         description="Academia only commands",
-        guild_ids=[self.academia_server_id],
+        guild_ids=[1197779801432391780],
     )
 
     @commands.command(name="pseudo", description="Send message pseudonymously")
@@ -81,6 +81,7 @@ class Academia(commands.Cog):
 
         # Get the "Moderator" role and the number of online members with that role
         moderator_role = discord.utils.get(server.roles, id=self.moderator_role_id)
+        print(moderator_role)
         if not moderator_role:
             return
         # count users in online if there status is either online or do not disturb
@@ -89,6 +90,7 @@ class Academia(commands.Cog):
             for member in server.members
             if moderator_role in member.roles and member.status == discord.Status.online
         )
+        print(online_moderators)
 
         # Check if more than 50% of the online members with the  role are currently online
         if online_moderators > server.member_count / 2:
@@ -96,6 +98,7 @@ class Academia(commands.Cog):
 
         channel = self.bot.get_channel(message.channel.id)
         moderation = automod.text_moderation(message.content)
+        print(moderation)
         if moderation[0]:  # Check if the first value of the tuple is True
             await message.delete()
 
