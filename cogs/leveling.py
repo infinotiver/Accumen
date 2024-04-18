@@ -4,6 +4,7 @@ from discord import app_commands
 import requests
 import os
 import utils.functions as funcs
+import utils.economy as economy
 from utils.functions import dembed, theme, divider
 import urllib.parse
 from reactionmenu import ViewMenu, ViewButton
@@ -42,23 +43,27 @@ class Levels(commands.Cog):
             xp -= (50 * ((lvl - 1) ** 2)) + (50 * (lvl - 1))
 
             if xp == 0:
-                return dembed(
-                    description=f"Well done <@{user_id}>! You leveled up to **level: {lvl}**"
+                user_data = await economy.get_user_data(user_id)
+                await economy.add_coins(user_id, lvl * 10)
+                await economy.add_gems(user_id, lvl)
+                embed = dembed(
+                    description=f"Congratulations <@{user_id}>! You leveled up to **level {lvl}**",
                 )
+                embed.add_field(name="Coins earned", value=lvl * 10)
+                embed.add_field(name="Gems earned", value=lvl)
+                return embed
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction):
         if str(interaction.type) == "InteractionType.application_command":
+
             xp_message = await self.add_xp(interaction.user.id, random.randint(5, 15))
             if xp_message:
                 await interaction.channel.send(embed=xp_message)
 
     @group.command(name="rank", description="Shows your xp and global rank")
-    async def rank(
-        self,
-        ctx,
-        # user:discord.Member
-    ):
+    async def rank(self, ctx, user: discord.Member = None):
+        user = user or ctx.user
         await ctx.response.defer()
         stats = await levelling.find_one({"id": ctx.user.id})
         if stats is None:
@@ -103,12 +108,11 @@ class Levels(commands.Cog):
           """
             # image = await card.card3()
             message = (
-                f"{ctx.user.mention}'s Level stats\n"
                 f"Name: **{ctx.user.mention}**\n"
                 f"XP: **{xp}/{int(200 * ((1 / 2) * lvl))}**\n"
                 f"Global Rank: **{rank}**\n"
                 f"Level: **{lvl}**\n"
-                f"Progress Bar : **{progress_bar}**\n"
+                f"Progress Bar :\n**{progress_bar}**\n"
             )
             embed = dembed(description=message, thumbnail=ctx.user.avatar.url)
             await ctx.followup.send(
@@ -120,7 +124,7 @@ class Levels(commands.Cog):
     async def lb(self, ctx):
         await ctx.response.send_message(
             embed=dembed(description="Wait till I fetch the latest details")
-            )
+        )
         rankings = levelling.find().sort("xp", -1)
         i = 1
         embed = dembed(
