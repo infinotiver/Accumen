@@ -40,7 +40,7 @@ class SelfNotes(commands.Cog):
     @notes.command(name="view", description="Shows your saved notes")
     async def view(self, ctx):
         await ctx.response.defer(ephemeral=True)
-        notes_cursor = await notes_mongodb.find({"id": ctx.author.id}).to_list(None)
+        notes_cursor = await notes_mongodb.find({"id": ctx.user.id}).to_list(None)
         notes = []
         async for note in notes_cursor:
             notes.append(note)
@@ -79,7 +79,7 @@ class SelfNotes(commands.Cog):
     @notes.command(name="delete", description="Deletes a note")
     async def delete(self, ctx, note_id: int):
         await ctx.response.defer(ephemeral=True)
-        notes_cursor = await notes_mongodb.find({"id": ctx.author.id})
+        notes_cursor = await notes_mongodb.find({"id": ctx.user.id})
         notes = await notes_cursor.to_list(length=None)
         if 0 < note_id <= len(notes):
             note = notes[note_id - 1]
