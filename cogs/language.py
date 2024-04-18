@@ -25,9 +25,9 @@ class Language(commands.Cog):
     ]
     group = app_commands.Group(
         name="language", description="Execute language-related commands."
-    )
+    ) 
 
-    @group.command(
+    @commands.command(
         name="grammar", description="Lists out grammatical improvements for a sentence"
     )
     @app_commands.choices(language=language_choices)
@@ -117,7 +117,7 @@ class Language(commands.Cog):
                 )
             )
 
-    @group.command(
+    @commands.command(
         name="define",
         description="Get definition of a word along with other useful information",
     )
