@@ -39,7 +39,7 @@ def text_moderation(text):
         # No flags raised
         return False, ""
 
-    except (KeyError, json.JSONDecodeError) as e:
+    except Exception as e:
         # Handle potential errors in the API response
         print(f"Error processing moderation response: {e}")
         return False, ""
