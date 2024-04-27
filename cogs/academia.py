@@ -7,7 +7,6 @@ import requests
 import os
 import utils.functions as funcs
 from utils.functions import dembed
-import utils.academia as acutils
 import utils.automod as automod
 import random
 
