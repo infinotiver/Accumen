@@ -9,7 +9,7 @@ from pyfiglet import Figlet
 import psutil
 import utils.functions as funcs
 from utils.functions import dembed, theme, divider
-from keeplive import keep_alive
+# from keeplive import keep_alive
 import utils.buttons as ubuttons
 import motor.motor_asyncio
 import nest_asyncio
@@ -90,5 +90,5 @@ async def on_ready():
 
 
 # [Setup] Running discord bot along with flask app
-keep_alive()
+# keep_alive()
 client.run(os.environ.get("token"), reconnect=True)
