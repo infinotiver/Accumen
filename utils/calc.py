@@ -1,4 +1,4 @@
-from simpcalc import simpcalc
+import simpcalc
 import discord
 from math import pi, tau, e, sqrt
 from utils.functions import dembed
@@ -179,3 +179,4 @@ class InteractiveView(discord.ui.View):
         self.expr = self.expr[:-1]
         embed = dembed(description=f"```\n{self.expr}\n```")
         await interaction.response.edit_message(embed=embed)
+

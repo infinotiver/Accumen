@@ -7,7 +7,7 @@ import requests
 import os
 import utils.functions as funcs
 from utils.functions import dembed
-import utils.automod as automod
+import utils.automod as auto_moderator
 import random
 
 
@@ -70,7 +70,6 @@ class Academia(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        # [TODO] store all ids, server ids , channel ids etc. in init func while setting up the cog
         server = message.guild
         if not server or server.id != self.academia_server_id:
             return
@@ -96,7 +95,7 @@ class Academia(commands.Cog):
             return
 
         channel = self.bot.get_channel(message.channel.id)
-        moderation = automod.text_moderation(message.content)
+        moderation = auto_moderator.text_moderation(message.content)
         print(moderation)
         if moderation[0]:  # Check if the first value of the tuple is True
             await message.delete()
@@ -106,13 +105,14 @@ class Academia(commands.Cog):
                 title="Message Blocked",
                 description="This message has been automatically blocked due to the following reasons:",
                 color=discord.Color.red(),
+                preset="beta"
             )
 
             # Add fields to the embed to provide more information
             embed.add_field(name="Reason", value=moderation[1], inline=False)
             embed.add_field(name="Author", value=message.author.mention, inline=True)
             embed.add_field(name="Channel", value=channel.mention, inline=True)
-            embed.set_footer(text="This message has been automatically moderated.")
+            embed.set_footer(text="AI Moderation")
 
             await channel.send(embed=embed)
 
