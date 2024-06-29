@@ -521,14 +521,13 @@ class Assist(commands.Cog):
                 return await ctx.followup.send(
                     "You haven't set any incoming channel yet"
                 )
-            else:
-                channel = await self.bot.get_channel(incoming.get("channel"))
-                await incoming.delete_one({"id": ctx.guild.id})
-                await ctx.followup.send(
-                    embed=dembed(
-                        description=f"Successfully unset {channel.mention} as incoming channel for receiving queries"
-                    )
+            channel = await self.bot.get_channel(incoming.get("channel"))
+            await incoming.delete_one({"id": ctx.guild.id})
+            await ctx.followup.send(
+                embed=dembed(
+                    description=f"Successfully unset {channel.mention} as incoming channel for receiving queries"
                 )
+            )
 
     @group.command(
         name="close",
