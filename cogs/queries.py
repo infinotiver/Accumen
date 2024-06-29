@@ -586,7 +586,7 @@ class Assist(commands.Cog):
 
     # Start the auto-close task loop
     @tasks.loop(hours=72)
-    async def auto_close_loop():
+    async def auto_close_loop(self):
         await auto_close_queries()
 
 
