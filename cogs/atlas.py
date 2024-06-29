@@ -102,9 +102,7 @@ class Atlas(commands.Cog):
                 "Currently, more than 5 participants can not play in a single game"
             )
         self.games[str(ctx.guild.id)]["users"].append(ctx.user.id)
-        channel = await self.bot.fetch_channel(
-            self.games[str(ctx.guild.id)]["channel"]
-        )
+        channel = await self.bot.fetch_channel(self.games[str(ctx.guild.id)]["channel"])
         msg = await channel.fetch_message(self.games[str(ctx.guild.id)]["message"])
         print(msg.embeds[0])
         embed = msg.embeds[0]
@@ -138,9 +136,7 @@ class Atlas(commands.Cog):
                 )
             )
 
-        self.games[str(ctx.guild.id)]["time"][
-            "started"
-        ] = ctx.created_at.timestamp()
+        self.games[str(ctx.guild.id)]["time"]["started"] = ctx.created_at.timestamp()
         order = self.games[str(ctx.guild.id)]["users"].copy()
         original_order = self.games[str(ctx.guild.id)]["users"].copy()
         player_index = 0
@@ -192,9 +188,7 @@ class Atlas(commands.Cog):
                         -1
                     ]  # Change current_alphabet to last letter of place if msg is valid
                     player_index = (player_index + 1) % len(order)
-                    self.games[str(ctx.guild.id)]["places_done"].append(
-                        input.content
-                    )
+                    self.games[str(ctx.guild.id)]["places_done"].append(input.content)
                     try:
                         await input.delete()
                     except:
@@ -229,9 +223,7 @@ class Atlas(commands.Cog):
         game_embed.add_field(
             name="Announcement Time", value=f"<t:{announce}:F>", inline=False
         )
-        game_embed.add_field(
-            name="Start Time", value=f"<t:{started}:F>", inline=False
-        )
+        game_embed.add_field(name="Start Time", value=f"<t:{started}:F>", inline=False)
         game_embed.add_field(name="End Time", value=f"<t:{ended}:F>", inline=False)
         await ctx.followup.send(embed=game_embed)
         del self.games[str(ctx.guild.id)]
