@@ -179,4 +179,3 @@ class InteractiveView(discord.ui.View):
         self.expr = self.expr[:-1]
         embed = dembed(description=f"```\n{self.expr}\n```")
         await interaction.response.edit_message(embed=embed)
-
