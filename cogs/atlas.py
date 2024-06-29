@@ -1,13 +1,8 @@
-import os
 import asyncio
 import discord
 from discord.ext import commands
-from discord import Button, SelectMenu, SelectOption
 from discord import app_commands
-import utils.buttons
-import utils.functions as funcs
 from utils.functions import dembed, theme, divider
-import json
 import requests
 from json.decoder import JSONDecodeError
 

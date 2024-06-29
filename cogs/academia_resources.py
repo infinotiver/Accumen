@@ -1,12 +1,9 @@
 import discord
 from discord.ext import commands
-from pymongo import MongoClient
 import os
 import motor.motor_asyncio
-import nest_asyncio
 from discord import app_commands
 import typing
-import utils.functions as funcs
 from utils.functions import dembed
 
 # Database connection (replace with your credentials)

@@ -1,13 +1,8 @@
 import os
-import asyncio
-import discord
 from discord.ext import commands
-from discord import Button, SelectMenu, SelectOption
 from pymongo import MongoClient
 from discord import app_commands
-import utils.buttons
-import utils.functions as funcs
-from utils.functions import dembed, theme, divider
+from utils.functions import dembed
 
 mongo_url = os.environ["mongodb"]
 cluster = MongoClient(mongo_url)

@@ -1,12 +1,8 @@
 import discord
 import random
-
-# import nltk
-import datetime
 from typing import Union, List, Dict
 import motor.motor_asyncio
 import nest_asyncio
-import random
 import os
 
 nest_asyncio.apply()

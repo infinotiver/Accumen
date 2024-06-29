@@ -10,7 +10,6 @@ from utils.functions import dembed
 from io import BytesIO
 import math
 from math import gcd  # Import gcd function from math module
-import sympy
 import utils.maths as maths_funcs
 
 maths_functions = {"GCD/HCF": "hcf", "LCM": "lcm"}

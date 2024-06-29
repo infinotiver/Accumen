@@ -1,13 +1,10 @@
 import discord
 import json
 from discord.ext import commands
-import utils.calc as calc
 from discord import app_commands
 import requests
 import os
-import json
-import utils.functions as funcs
-from utils.functions import dembed, theme, divider
+from utils.functions import dembed
 from reactionmenu import ViewMenu, ViewButton
 
 chat_api = os.environ["huggingface"]

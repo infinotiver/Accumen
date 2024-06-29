@@ -1,6 +1,5 @@
 import requests
 import os
-import json
 
 
 def text_moderation(text):

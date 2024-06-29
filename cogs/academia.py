@@ -1,11 +1,8 @@
 import hashlib
 import discord
-import json
-from discord.ext import commands, tasks
+from discord.ext import commands
 from discord import app_commands
-import requests
 import os
-import utils.functions as funcs
 from utils.functions import dembed
 import utils.automod as auto_moderator
 import random

@@ -1,20 +1,18 @@
 # [Imports] Importing required modules/libraries
 import os
 import discord
-from discord import app_commands
 from discord.ext import commands
 import utils.functions as funcs
 from termcolor import colored
 from pyfiglet import Figlet
 import psutil
+
 import utils.functions as funcs
 from utils.functions import dembed, theme, divider
 
 # from keeplive import keep_alive
 import utils.buttons as ubuttons
 import motor.motor_asyncio
-import nest_asyncio
-import asyncio
 import datetime
 import time
 from dotenv import load_dotenv
