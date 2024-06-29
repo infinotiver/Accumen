@@ -24,7 +24,7 @@ class Language(commands.Cog):
     ]
     group = app_commands.Group(
         name="language", description="Execute language-related commands."
-    ) 
+    )
 
     @group.command(
         name="grammar", description="Lists out grammatical improvements for a sentence"

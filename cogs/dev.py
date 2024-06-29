@@ -22,7 +22,9 @@ class Dev(commands.Cog):
             counts_entry = await system_data.find_one({"_id": "commands_usage"})
             if counts_entry is not None:
                 counts = counts_entry["count"] + 1
-                await system_data.update_one({"_id": "commands_usage"}, {"$set": {"count": counts}})
+                await system_data.update_one(
+                    {"_id": "commands_usage"}, {"$set": {"count": counts}}
+                )
                 print(counts)
             else:
                 await system_data.insert_one({"_id": "commands_usage", "count": 1})

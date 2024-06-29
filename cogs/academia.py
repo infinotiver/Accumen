@@ -102,7 +102,7 @@ class Academia(commands.Cog):
                 title="Message Blocked",
                 description="This message has been automatically blocked due to the following reasons:",
                 color=discord.Color.red(),
-                preset="beta"
+                preset="beta",
             )
 
             # Add fields to the embed to provide more information
