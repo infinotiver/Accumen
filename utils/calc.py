@@ -1,6 +1,6 @@
 import simpcalc
 import discord
-from math import pi, tau, e, sqrt
+from math import pi
 from utils.functions import dembed
 
 

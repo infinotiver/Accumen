@@ -1,12 +1,9 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-import requests
 import os
-import utils.functions as funcs
 import utils.economy as economy
-from utils.functions import dembed, theme, divider
-import urllib.parse
+from utils.functions import dembed
 from reactionmenu import ViewMenu, ViewButton
 import motor.motor_asyncio
 import nest_asyncio

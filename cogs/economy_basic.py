@@ -1,15 +1,11 @@
 import os
 import discord
-import psutil
 from discord import app_commands
 from discord.ext import commands
 import motor.motor_asyncio
 import nest_asyncio
-import json
-import random
-import utils.functions as funcs
 import utils.economy as economy_functions
-from utils.functions import dembed, theme, divider
+from utils.functions import dembed
 from dotenv import load_dotenv
 
 nest_asyncio.apply()

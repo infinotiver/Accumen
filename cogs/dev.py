@@ -1,8 +1,5 @@
-import discord
 from discord.ext import commands
 from discord import app_commands
-import utils.functions as funcs
-from utils.functions import dembed, theme, divider
 import motor.motor_asyncio
 import nest_asyncio
 import os
