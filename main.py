@@ -2,13 +2,10 @@
 import os
 import discord
 from discord.ext import commands
-import utils.functions as funcs
 from termcolor import colored
 from pyfiglet import Figlet
 import psutil
-
-import utils.functions as funcs
-from utils.functions import dembed, theme, divider
+from utils.functions import dembed
 
 # from keeplive import keep_alive
 import utils.buttons as ubuttons
