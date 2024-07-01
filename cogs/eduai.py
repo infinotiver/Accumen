@@ -1,11 +1,9 @@
-import discord
 import json
 from discord.ext import commands
 from discord import app_commands
 import requests
 import os
 from utils.functions import dembed
-from reactionmenu import ViewMenu, ViewButton
 
 chat_api = os.environ["huggingface"]
 chat_url = "https://api-inference.huggingface.co/models/satvikag/chatbot"
