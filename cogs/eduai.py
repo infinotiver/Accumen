@@ -63,57 +63,6 @@ class EduAI(commands.Cog):
                 preset="beta",
             )
         )
-        try:
-            await ctx.response.defer()
-            url = "https://essay-writer.p.rapidapi.com/essay-writer"
-            payload = {
-                "title": title,
-                "essaytype": essay_type.value,
-                "language": "english",
-            }
-            headers = {
-                "content-type": "application/json",
-                "X-RapidAPI-Key": os.environ["rapidapi"],
-                "X-RapidAPI-Host": "essay-writer.p.rapidapi.com",
-            }
-            response = requests.post(url, json=payload, headers=headers)
-            response = response.json()
-            essay = response["essay"]
-            cites = response["resources"]
-            print(essay)
-            embed = dembed(
-                title=title,
-                description="API | Hard limit of 8 requests per month ",
-                preset="beta",
-            )
-
-            max_chars = 1000  # maximum characters per message
-            menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbedDynamic, rows_requested=1)
-            menu.set_main_pages(embed)
-            essay_messages = [
-                essay[i : i + max_chars] for i in range(0, len(essay), max_chars)
-            ]
-            for msg in essay_messages:
-                menu.add_row(msg)
-            back_button = ViewButton(
-                style=discord.ButtonStyle.primary,
-                label="Back",
-                custom_id=ViewButton.ID_PREVIOUS_PAGE,
-            )
-            menu.add_button(back_button)
-
-            # ViewButton.ID_NEXT_PAGE
-            next_button = ViewButton(
-                style=discord.ButtonStyle.secondary,
-                label="Next",
-                custom_id=ViewButton.ID_NEXT_PAGE,
-            )
-            menu.add_button(next_button)
-            await menu.start()
-        except Exception as e:
-            await ctx.followup.send(
-                f"{e}\nAn error occurred while processing your request.\nThe hard limit of 8 requests per month is applied by the API"
-            )
 
     # Highly fatal , random generations
     @group.command(
