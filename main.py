@@ -2,7 +2,6 @@
 import os
 import discord
 from discord.ext import commands
-import utils.functions as funcs
 from termcolor import colored
 from pyfiglet import Figlet
 import psutil
