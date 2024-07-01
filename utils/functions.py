@@ -1,5 +1,4 @@
 import discord
-import random
 from typing import Union, List, Dict
 import motor.motor_asyncio
 import nest_asyncio
